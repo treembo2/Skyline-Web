@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skyline Store | Cuentas y Streaming</title>
-<meta name="description" content="Netflix, Spotify, Disney+ y más, directo por Discord. Pagás por transferencia y te entregamos al toque.">
+<meta name="description" content="Netflix, Spotify, Disney+ y más, directo por Discord. Pagás por transferencia y te entregamos enseguida.">
 <meta name="theme-color" content="#0A0E14">
 <meta property="og:title" content="Skyline Store | Cuentas y Streaming">
 <meta property="og:description" content="Netflix, Spotify, Disney+ y más, directo por Discord.">
@@ -22,8 +22,8 @@
     --sky-panel: #131A24;      /* Tarjeta y contenedores */
     --sky-panel-2: #1C2530;    /* Paneles secundarios / hover */
     --sky-line: #26303C;       /* Borde sutil */
-    --horizon-orange: #4F7DFF; /* Acento primario azul eléctrico */
-    --horizon-violet: #7C5CFF; /* Acento hover violeta */
+    --horizon-orange: #FF7A45; /* Acento primario, naranja cálido */
+    --horizon-violet: #FF9D6C; /* Acento hover, tono más claro */
     --gold: #F2B84B;           /* Resaltados y precios en dorado cálido */
     --text-hi: #F2F4F7;        /* Texto principal casi blanco */
     --text-mid: #97A1AD;       /* Texto secundario gris azulado */
@@ -101,44 +101,31 @@
 
   /* Hero */
   .hero{
-    position:relative;padding:90px 48px 0;
+    position:relative;padding:96px 48px 0;
     text-align:center;max-width:900px;margin:0 auto;
-  }
-  .eyebrow{
-    display:inline-flex;align-items:center;gap:8px;
-    font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
-    color:var(--gold);margin-bottom:24px;
-    border:1px solid rgba(44,62,80,0.2);
-    padding:6px 14px;border-radius:100px;
-    background:rgba(44,62,80,0.05);
-  }
-  .eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);}
-
-  .hero-kicker{
-    font-size:13px;color:var(--text-mid);margin-bottom:18px;font-weight:600;
   }
 
   h1.hero-title{
-    margin-bottom:22px;line-height:1;
-  }
-  .hero-logo{
-    width:min(280px,60vw);height:auto;display:block;margin:0 auto;
-    filter:drop-shadow(0 0 40px rgba(124,92,255,0.25));
+    font-size:clamp(44px,6.5vw,80px);
+    line-height:1;font-weight:900;
+    background:linear-gradient(180deg,#F2F4F7 30%, #97A1AD 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin-bottom:20px;letter-spacing:-0.01em;
   }
   .hero-sub{
     font-size:17px;color:var(--text-mid);
-    max-width:540px;margin:0 auto 36px;line-height:1.6;
+    max-width:480px;margin:0 auto 38px;line-height:1.6;
   }
-  .hero-ctas{display:flex;gap:14px;justify-content:center;margin-bottom:56px;flex-wrap:wrap;}
+  .hero-ctas{display:flex;gap:12px;justify-content:center;margin-bottom:52px;flex-wrap:wrap;}
   .btn-primary{
     padding:15px 30px;border-radius:12px;
-    background:linear-gradient(135deg,var(--horizon-orange),var(--horizon-violet));
+    background:var(--horizon-orange);
     color:#fff;font-weight:700;font-size:14.5px;
-    box-shadow:0 8px 30px -8px rgba(44,62,80,0.3);
-    transition:transform .2s;
+    box-shadow:0 8px 24px -6px rgba(255,122,69,0.35);
+    transition:.2s;
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
   }
-  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-primary:hover{transform:translateY(-2px);background:var(--horizon-violet);}
   .btn-secondary{
     padding:15px 30px;border-radius:12px;
     background:var(--sky-panel);border:1px solid var(--sky-line);
@@ -242,8 +229,8 @@
   }
   .card-icon.disney{background:#0d47c7;font-family:'Unbounded';font-weight:700;color:#fff;font-size:16px;}
   .card-name{font-size:16px;font-weight:700;margin-bottom:4px;}
-  .card-price{font-family:'JetBrains Mono';font-size:14px;color:var(--gold);margin-bottom:18px;}
-  .card-price span{color:var(--text-low);font-size:12px;}
+  .card-price{font-family:'Unbounded';font-weight:700;font-size:15px;color:var(--gold);margin-bottom:18px;}
+  .card-price span{color:var(--text-low);font-size:11px;font-family:'Manrope';font-weight:500;}
   .btn-card{
     width:100%;padding:11px;border-radius:9px;margin-top:auto;
     background:transparent;border:1px solid var(--sky-line);
@@ -480,6 +467,25 @@
   .track-empty{color:var(--text-low);font-size:13px;text-align:center;padding:20px 0;}
   .track-order-code{font-family:'JetBrains Mono';color:var(--gold);font-size:15px;margin-bottom:4px;}
   .track-order-items{color:var(--text-mid);font-size:13px;margin-bottom:20px;line-height:1.6;}
+
+  /* Detalle de producto */
+  .pd-top{display:flex;gap:16px;align-items:center;margin-bottom:20px;}
+  .pd-icon{
+    width:64px;height:64px;border-radius:14px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .pd-icon .logo-mask{width:32px;height:32px;}
+  .pd-tag{font-size:12px;color:var(--text-low);margin-bottom:4px;}
+  .pd-name{font-family:'Unbounded';font-weight:700;font-size:18px;margin-bottom:6px;}
+  .pd-desc{color:var(--text-mid);font-size:14px;line-height:1.6;margin-bottom:20px;}
+  .pd-price-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 18px;border-radius:12px;background:var(--sky-panel-2);
+    border:1px solid var(--sky-line);
+  }
+  .pd-price-row span{color:var(--text-low);font-size:13px;}
+  .pd-price-row b{font-family:'Unbounded';font-weight:700;font-size:20px;color:var(--gold);}
+  .card{cursor:pointer;}
   .order-code-row{
     display:flex;align-items:center;justify-content:space-between;
     background:var(--sky-panel-2);border:1px solid var(--sky-line);
@@ -540,9 +546,8 @@
 </header>
 
 <div class="hero">
-  <p class="hero-kicker">🎮 store por Discord, sin vueltas</p>
-  <h1 class="hero-title"><img src="skyline-logo-hero.jpg" alt="Skyline Store" class="hero-logo"></h1>
-  <p class="hero-sub">Netflix, Spotify, Disney+, cuentas de juegos... lo que necesites. Comprás, transferís y en un rato ya tenés todo listo.</p>
+  <h1 class="hero-title">Skyline Store</h1>
+  <p class="hero-sub">Cuentas de Netflix, Spotify, Disney+ y varias más. Transferís y en un rato lo tenés en tu Discord.</p>
   <div class="hero-ctas">
     <a href="#tienda" class="btn-primary">Ver catálogo</a>
     <a href="#faq" class="btn-secondary">Preguntas frecuentes</a>
@@ -557,28 +562,28 @@
 <section id="como-funciona">
   <div class="section-head">
     <h2 class="section-title">¿Cómo funciona?</h2>
-    <p class="section-desc">Cuatro pasos, nada complicado.</p>
+    <p class="section-desc">Cuatro pasos simples.</p>
   </div>
   <div class="how-grid">
     <div class="how-card">
       <div class="how-num">1</div>
       <h4>Elegís lo que querés</h4>
-      <p>Buscás en el catálogo y lo tirás al carrito, podés meter varias cosas juntas.</p>
+      <p>Buscás en el catálogo y lo agregás al carrito, podés sumar varios productos juntos.</p>
     </div>
     <div class="how-card">
       <div class="how-num">2</div>
       <h4>Transferís</h4>
-      <p>Te pasamos alias y el monto justo, hacés la transferencia y ya está.</p>
+      <p>Te pasamos el alias y el monto exacto, hacés la transferencia y listo.</p>
     </div>
     <div class="how-card">
       <div class="how-num">3</div>
       <h4>Abrís un ticket</h4>
-      <p>Copiás el resumen y lo pegás en Discord junto con el comprobante.</p>
+      <p>Copiás el resumen del pedido y lo pegás en Discord junto con el comprobante.</p>
     </div>
     <div class="how-card">
       <div class="how-num">4</div>
-      <h4>Te llega la cuenta</h4>
-      <p>Alguien del staff chequea el pago y te tira los datos ahí mismo.</p>
+      <h4>Recibís la cuenta</h4>
+      <p>El staff confirma el pago y te envía los datos ahí mismo.</p>
     </div>
   </div>
 </section>
@@ -607,7 +612,7 @@
 
   <div class="grid" id="productGrid">
     <!-- Steam -->
-    <div class="card" data-cat="juegos" data-name="Steam Account" data-price="30" data-icon-bg="#171a21" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg" data-icon-fill="#fff">
+    <div class="card" data-cat="juegos" data-desc="Cuenta de Steam con acceso completo por 30 a 60 días. Podés cambiar el correo y la clave apenas la recibís." data-name="Steam Account" data-price="30" data-icon-bg="#171a21" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg" data-icon-fill="#fff">
       <div class="card-top">
         <div class="card-tag">Full Access (30-60 días)</div>
         <div class="stock-badge"><span class="stock-dot"></span> 14 disponibles</div>
@@ -621,7 +626,7 @@
     </div>
 
     <!-- Rockstar -->
-    <div class="card" data-cat="juegos" data-name="Rockstar Account" data-price="250" data-icon-bg="#fcaf17" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg" data-icon-fill="#000">
+    <div class="card" data-cat="juegos" data-desc="Cuenta de Rockstar Games lista para usar en servidores de FiveM. No incluye GTA V activado." data-name="Rockstar Account" data-price="250" data-icon-bg="#fcaf17" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg" data-icon-fill="#000">
       <div class="card-top">
         <div class="card-tag">FiveM Fresh (No GTA V)</div>
         <div class="stock-badge"><span class="stock-dot"></span> 6 disponibles</div>
@@ -635,7 +640,7 @@
     </div>
 
     <!-- Discord -->
-    <div class="card" data-cat="juegos" data-name="Discord Account" data-price="250" data-icon-bg="#5865F2" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg" data-icon-fill="#fff">
+    <div class="card" data-cat="juegos" data-desc="Cuenta de Discord con acceso completo, incluye el correo asociado. Podés modificarla como quieras." data-name="Discord Account" data-price="250" data-icon-bg="#5865F2" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg" data-icon-fill="#fff">
       <div class="card-top">
         <div class="card-tag">Full Access + Mail</div>
         <div class="stock-badge"><span class="stock-dot"></span> 22 disponibles</div>
@@ -649,7 +654,7 @@
     </div>
 
     <!-- IPVanish -->
-    <div class="card" data-cat="vpn" data-name="IPVanish VPN" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg" data-icon-fill="#44B035">
+    <div class="card" data-cat="vpn" data-desc="Cuenta premium de IPVanish, lista para usar con los datos que te entregamos." data-name="IPVanish VPN" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg" data-icon-fill="#44B035">
       <div class="card-top">
         <div class="card-tag">NFA Premium</div>
         <div class="stock-badge"><span class="stock-dot"></span> 9 disponibles</div>
@@ -663,7 +668,7 @@
     </div>
 
     <!-- NordVPN -->
-    <div class="card" data-cat="vpn" data-name="NordVPN Account" data-price="2000" data-icon-bg="#4687FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg" data-icon-fill="#fff">
+    <div class="card" data-cat="vpn" data-desc="Cuenta premium de NordVPN, acceso inmediato con los datos de inicio de sesión." data-name="NordVPN Account" data-price="2000" data-icon-bg="#4687FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg" data-icon-fill="#fff">
       <div class="card-top">
         <div class="card-tag">NFA Premium</div>
         <div class="stock-badge"><span class="stock-dot"></span> 5 disponibles</div>
@@ -677,7 +682,7 @@
     </div>
 
     <!-- ChatGPT Plus -->
-    <div class="card" data-cat="ia" data-name="ChatGPT Plus" data-price="6000" data-icon-bg="#10a37f" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg" data-icon-fill="#fff">
+    <div class="card" data-cat="ia" data-desc="Cuenta de ChatGPT Plus con acceso completo a correo y clave, incluye todos los modelos del plan." data-name="ChatGPT Plus" data-price="6000" data-icon-bg="#10a37f" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg" data-icon-fill="#fff">
       <div class="card-top">
         <div class="card-tag">Full Access (Mail:Clave)</div>
         <div class="stock-badge"><span class="stock-dot"></span> 11 disponibles</div>
@@ -691,7 +696,7 @@
     </div>
 
     <!-- Disney+ -->
-    <div class="card" data-cat="streaming" data-name="Disney+" data-price="1000" data-icon-color="disney" data-icon-content="D+">
+    <div class="card" data-cat="streaming" data-desc="Cuenta de Disney+ lista para usar, con perfil individual." data-name="Disney+" data-price="1000" data-icon-color="disney" data-icon-content="D+">
       <div class="card-top">
         <div class="card-tag">NFA</div>
         <div class="stock-badge"><span class="stock-dot"></span> 18 disponibles</div>
@@ -703,7 +708,7 @@
     </div>
 
     <!-- Netflix -->
-    <div class="card" data-cat="streaming" data-name="Netflix" data-price="3000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg" data-icon-fill="#E50914">
+    <div class="card" data-cat="streaming" data-desc="Cuenta de Netflix con acceso vitalicio y perfil propio." data-name="Netflix" data-price="3000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg" data-icon-fill="#E50914">
       <div class="card-top">
         <div class="card-tag">Acceso Vitalicio</div>
         <div class="stock-badge"><span class="stock-dot"></span> 27 disponibles</div>
@@ -717,7 +722,7 @@
     </div>
 
     <!-- HBO Max -->
-    <div class="card" data-cat="streaming" data-name="HBO Max" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg" data-icon-fill="#fff">
+    <div class="card" data-cat="streaming" data-desc="Cuenta de HBO Max lista para usar, con perfil individual." data-name="HBO Max" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg" data-icon-fill="#fff">
       <div class="card-top">
         <div class="card-tag">NFA</div>
         <div class="stock-badge"><span class="stock-dot"></span> 8 disponibles</div>
@@ -731,7 +736,7 @@
     </div>
 
     <!-- Crunchyroll -->
-    <div class="card" data-cat="anime" data-name="Crunchyroll" data-price="1250" data-icon-bg="#F47521" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg" data-icon-fill="#fff">
+    <div class="card" data-cat="anime" data-desc="Cuenta de Crunchyroll para ver anime sin publicidad, con perfil individual." data-name="Crunchyroll" data-price="1250" data-icon-bg="#F47521" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg" data-icon-fill="#fff">
       <div class="card-top">
         <div class="card-tag">NFA</div>
         <div class="stock-badge"><span class="stock-dot"></span> 4 disponibles</div>
@@ -745,7 +750,7 @@
     </div>
 
     <!-- Paramount+ -->
-    <div class="card" data-cat="streaming" data-name="Paramount+" data-price="1500" data-icon-bg="#0064FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg" data-icon-fill="#fff">
+    <div class="card" data-cat="streaming" data-desc="Cuenta de Paramount+ lista para usar, con perfil individual." data-name="Paramount+" data-price="1500" data-icon-bg="#0064FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg" data-icon-fill="#fff">
       <div class="card-top">
         <div class="card-tag">NFA</div>
         <div class="stock-badge"><span class="stock-dot"></span> 12 disponibles</div>
@@ -759,7 +764,7 @@
     </div>
 
     <!-- Spotify -->
-    <div class="card" data-cat="musica" data-name="Spotify" data-price="3500" data-icon-bg="#1DB954" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg" data-icon-fill="#fff">
+    <div class="card" data-cat="musica" data-desc="Cuenta de Spotify Premium con acceso completo, podés cambiar el correo y la clave." data-name="Spotify" data-price="3500" data-icon-bg="#1DB954" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg" data-icon-fill="#fff">
       <div class="card-top">
         <div class="card-tag">FA (Full Access)</div>
         <div class="stock-badge"><span class="stock-dot"></span> 16 disponibles</div>
@@ -837,7 +842,7 @@
     </div>
     <div class="faq-item">
       <div class="faq-question"><span>¿Tienen garantía las cuentas?</span><span class="faq-icon">▼</span></div>
-      <div class="faq-answer">Sí. Si te falla algo dentro del período que corresponde, te la cambiamos sin drama, avisá nomás por el ticket.</div>
+      <div class="faq-answer">Sí. Si te falla algo dentro del período que corresponde, te la reponemos sin costo, avisanos por el ticket.</div>
     </div>
   </div>
 </section>
@@ -856,7 +861,7 @@
   <div class="footer-main">
     <div>
       <div class="footer-brand-mark"><img src="skyline-logo-icon.png" alt="Skyline Store" class="footer-brand-img"> Skyline Store</div>
-      <p class="footer-desc">Arrancamos vendiendo entre amigos y de a poco se fue armando esto. Todo se maneja acá, por Discord, sin call center ni nada raro.</p>
+      <p class="footer-desc">Empezamos vendiendo entre conocidos y de a poco fue creciendo. Toda la atención se maneja por Discord.</p>
       <div class="footer-socials">
         <a href="https://discord.gg/B3wp4Ygv8J" target="_blank" class="footer-social-btn" title="Discord">💬</a>
         <a href="#" class="footer-social-btn" title="Instagram">📷</a>
@@ -883,7 +888,7 @@
   </div>
   <div class="footer-bottom">
     <div>© 2026 Skyline Store</div>
-    <div>Manejado por gente de acá, no por una empresa 🇦🇷</div>
+    <div>Atendido directamente por el equipo, sin intermediarios 🇦🇷</div>
   </div>
 </footer>
 
@@ -932,12 +937,12 @@
       <div class="pay-details">
         <div class="pay-row">
           <span>Alias</span>
-          <b id="aliasVal">ssegoovia1</b>
-          <button class="copy-btn" data-copy="ssegoovia1">Copiar</button>
+          <b id="aliasVal" style="color:var(--text-low);font-style:italic;">Completar</b>
+          <button class="copy-btn" id="copyAliasBtn" data-copy="">Copiar</button>
         </div>
         <div class="pay-row">
           <span>Titular</span>
-          <b>Fausto Segovia</b>
+          <b id="titularVal" style="color:var(--text-low);font-style:italic;">Completar</b>
         </div>
         <div class="pay-row">
           <span>Monto a transferir</span>
@@ -1004,6 +1009,34 @@
       <div id="trackResult">
         <div class="track-empty">Ingresá tu código de pedido para ver el estado.</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Detalle de Producto Panel ===== -->
+<div id="productOverlay" class="overlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h3 id="pdTitle">Producto</h3>
+      <button class="panel-close" id="closeProductDetail">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="pd-top">
+        <div class="pd-icon" id="pdIcon"></div>
+        <div>
+          <div class="pd-tag" id="pdTag"></div>
+          <div class="pd-name" id="pdName"></div>
+          <div class="stock-badge" id="pdStock"><span class="stock-dot"></span></div>
+        </div>
+      </div>
+      <p class="pd-desc" id="pdDesc"></p>
+      <div class="pd-price-row">
+        <span>Precio</span>
+        <b id="pdPrice"></b>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn-primary" id="pdAddBtn" style="width:100%;">Agregar al carrito</button>
     </div>
   </div>
 </div>
@@ -1140,20 +1173,51 @@ loadReviews();
     });
   });
 
-  // Agregar al carrito (delegación de eventos)
-  document.getElementById('productGrid').addEventListener('click', (e)=>{
-    const btn = e.target.closest('.add-cart-btn');
-    if(!btn) return;
-
-    const card = btn.closest('.card');
+  function addProductToCart(card){
     const name = card.dataset.name;
     const price = parseInt(card.dataset.price, 10);
     const existing = cart.find(i=>i.name===name);
     if(existing){ existing.qty++; }
     else { cart.push({name, price, qty:1, iconHTML: buildIconHTML(card)}); }
-    
+
     showToast(`${name} agregado al carrito`);
     renderCart();
+  }
+
+  // ===== Detalle de producto =====
+  const productOverlay = document.getElementById('productOverlay');
+  let activeProductCard = null;
+
+  function openProductDetail(card){
+    activeProductCard = card;
+    document.getElementById('pdTitle').textContent = card.dataset.name;
+    document.getElementById('pdName').textContent = card.dataset.name;
+    document.getElementById('pdTag').textContent = card.querySelector('.card-tag')?.textContent || '';
+    document.getElementById('pdStock').innerHTML = '<span class="stock-dot"></span>' + (card.querySelector('.stock-badge')?.textContent.trim() || '');
+    document.getElementById('pdDesc').textContent = card.dataset.desc || 'Sin descripción disponible por ahora.';
+    document.getElementById('pdPrice').textContent = fmt(parseInt(card.dataset.price,10));
+    document.getElementById('pdIcon').innerHTML = buildIconHTML(card);
+    productOverlay.classList.add('open');
+  }
+
+  // Click en el grid: botón agrega al carrito, cualquier otro click abre el detalle
+  document.getElementById('productGrid').addEventListener('click', (e)=>{
+    const card = e.target.closest('.card');
+    if(!card) return;
+
+    if(e.target.closest('.add-cart-btn')){
+      addProductToCart(card);
+      return;
+    }
+    openProductDetail(card);
+  });
+
+  document.getElementById('closeProductDetail').addEventListener('click', ()=> productOverlay.classList.remove('open'));
+  productOverlay.addEventListener('click', (e)=>{ if(e.target===productOverlay) productOverlay.classList.remove('open'); });
+  document.getElementById('pdAddBtn').addEventListener('click', ()=>{
+    if(!activeProductCard) return;
+    addProductToCart(activeProductCard);
+    productOverlay.classList.remove('open');
   });
 
   function renderCart(){
