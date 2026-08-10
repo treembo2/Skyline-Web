@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skyline Store | Cuentas y Streaming</title>
+<meta name="description" content="Netflix, Spotify, Disney+ y más, directo por Discord. Pagás por transferencia y te entregamos al toque.">
+<meta name="theme-color" content="#0A0E14">
+<meta property="og:title" content="Skyline Store | Cuentas y Streaming">
+<meta property="og:description" content="Netflix, Spotify, Disney+ y más, directo por Discord.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Supabase SDK JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    /* Paleta Skyline Nocturno */
+    --sky-deep: #0A0E14;       /* Fondo azul casi negro */
+    --sky-panel: #131A24;      /* Tarjeta y contenedores */
+    --sky-panel-2: #1C2530;    /* Paneles secundarios / hover */
+    --sky-line: #26303C;       /* Borde sutil */
+    --horizon-orange: #4F7DFF; /* Acento primario azul eléctrico */
+    --horizon-violet: #7C5CFF; /* Acento hover violeta */
+    --gold: #F2B84B;           /* Resaltados y precios en dorado cálido */
+    --text-hi: #F2F4F7;        /* Texto principal casi blanco */
+    --text-mid: #97A1AD;       /* Texto secundario gris azulado */
+    --text-low: #5C6672;       /* Texto atenuado */
+    --success: #34D399;        /* Verde de éxito / disponible */
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--sky-deep);
+    color:var(--text-hi);
+    font-family:'Manrope',sans-serif;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--horizon-violet);color:#fff;}
+
+  .display{font-family:'Unbounded',sans-serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;border:none;}
+
+  /* Ambient glow */
+  .glow-field{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(60% 40% at 50% 0%, rgba(44,62,80,0.05), transparent 60%),
+      radial-gradient(45% 30% at 80% 10%, rgba(26,37,47,0.03), transparent 60%);
+  }
+
+  /* Toast Notification */
+  .toast-container{
+    position:fixed;bottom:24px;right:24px;z-index:200;
+    display:flex;flex-direction:column;gap:10px;pointer-events:none;
+  }
+  .toast{
+    background:var(--sky-panel-2);border:1px solid var(--horizon-violet);
+    color:var(--text-hi);padding:12px 20px;border-radius:12px;
+    font-size:13.5px;box-shadow:0 10px 30px rgba(0,0,0,0.1);
+    animation:toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+    display:flex;align-items:center;gap:10px;
+  }
+  @keyframes toastIn{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  @keyframes toastOut{from{transform:translateY(0);opacity:1;}to{transform:translateY(20px);opacity:0;}}
+
+  /* Header */
+  header{
+    position:sticky;top:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 48px;
+    background:rgba(10,14,20,0.85);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--sky-line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Unbounded';font-weight:700;font-size:15px;letter-spacing:0.02em;}
+  .brand-mark-img{
+    width:38px;height:38px;border-radius:9px;object-fit:cover;
+    display:block;
+  }
+  nav{display:flex;gap:34px;font-size:14px;color:var(--text-mid);}
+  nav a:hover{color:var(--text-hi);}
+  .nav-right{display:flex;align-items:center;gap:14px;}
+  .btn-ghost{
+    padding:9px 16px;border-radius:100px;border:1px solid var(--sky-line);
+    font-size:13px;color:var(--text-mid);background:transparent;
+    transition:.2s;
+  }
+  .btn-ghost:hover{border-color:var(--text-mid);color:var(--text-hi);}
+  .btn-discord{
+    padding:9px 18px;border-radius:100px;
+    background:var(--horizon-orange);color:#ffffff;
+    font-size:13px;font-weight:700;
+    display:flex;align-items:center;gap:8px;
+  }
+
+  /* Hero */
+  .hero{
+    position:relative;padding:90px 48px 0;
+    text-align:center;max-width:900px;margin:0 auto;
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--gold);margin-bottom:24px;
+    border:1px solid rgba(44,62,80,0.2);
+    padding:6px 14px;border-radius:100px;
+    background:rgba(44,62,80,0.05);
+  }
+  .eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);}
+
+  .hero-kicker{
+    font-size:13px;color:var(--text-mid);margin-bottom:18px;font-weight:600;
+  }
+
+  h1.hero-title{
+    margin-bottom:22px;line-height:1;
+  }
+  .hero-logo{
+    width:min(280px,60vw);height:auto;display:block;margin:0 auto;
+    filter:drop-shadow(0 0 40px rgba(124,92,255,0.25));
+  }
+  .hero-sub{
+    font-size:17px;color:var(--text-mid);
+    max-width:540px;margin:0 auto 36px;line-height:1.6;
+  }
+  .hero-ctas{display:flex;gap:14px;justify-content:center;margin-bottom:56px;flex-wrap:wrap;}
+  .btn-primary{
+    padding:15px 30px;border-radius:12px;
+    background:linear-gradient(135deg,var(--horizon-orange),var(--horizon-violet));
+    color:#fff;font-weight:700;font-size:14.5px;
+    box-shadow:0 8px 30px -8px rgba(44,62,80,0.3);
+    transition:transform .2s;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-secondary{
+    padding:15px 30px;border-radius:12px;
+    background:var(--sky-panel);border:1px solid var(--sky-line);
+    color:var(--text-hi);font-weight:600;font-size:14.5px;
+    transition:.2s;
+  }
+  .btn-secondary:hover{background:var(--sky-panel-2);}
+
+  .trust-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+  .trust-pill{
+    font-size:12.5px;color:var(--text-mid);
+    padding:8px 14px;border-radius:100px;
+    border:1px solid var(--sky-line);
+    display:flex;align-items:center;gap:7px;
+  }
+
+  /* Cómo funciona */
+  .how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:step;}
+  @media(max-width:920px){.how-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.how-grid{grid-template-columns:1fr;}}
+  .how-card{
+    background:var(--sky-panel);border:1px solid var(--sky-line);
+    border-radius:16px;padding:24px;position:relative;
+  }
+  .how-num{
+    width:34px;height:34px;border-radius:10px;
+    background:linear-gradient(135deg,var(--horizon-orange),var(--horizon-violet));
+    color:#fff;font-family:'Unbounded';font-weight:700;font-size:15px;
+    display:flex;align-items:center;justify-content:center;margin-bottom:16px;
+  }
+  .how-card h4{font-size:15px;margin-bottom:6px;}
+  .how-card p{font-size:13px;color:var(--text-mid);line-height:1.55;}
+  .how-connector{
+    display:none;position:absolute;top:35px;left:100%;width:16px;height:2px;
+    background:var(--sky-line);
+  }
+  @media(min-width:921px){.how-connector{display:block;}}
+
+  /* Section shell */
+  section{position:relative;z-index:1;padding:60px 48px;max-width:1180px;margin:0 auto;}
+  .section-head{text-align:center;margin-bottom:36px;}
+  .section-head .eyebrow{margin-bottom:14px;}
+  .section-title{font-family:'Unbounded';font-weight:700;font-size:clamp(26px,3.8vw,36px);margin-bottom:10px;}
+  .section-desc{color:var(--text-mid);font-size:15px;}
+
+  /* Filter Controls */
+  .catalog-controls{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:16px;margin-bottom:32px;flex-wrap:wrap;
+  }
+  .search-box{
+    position:relative;flex:1;min-width:240px;max-width:380px;
+  }
+  .search-input{
+    width:100%;padding:12px 16px 12px 42px;border-radius:12px;
+    background:var(--sky-panel);border:1px solid var(--sky-line);
+    color:var(--text-hi);font-size:14px;outline:none;transition:.2s;
+  }
+  .search-input:focus{border-color:var(--horizon-violet);}
+  .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-low);font-size:15px;}
+
+  .filter-tabs{display:flex;gap:8px;flex-wrap:wrap;}
+  .filter-tab{
+    padding:8px 16px;border-radius:100px;background:var(--sky-panel);
+    border:1px solid var(--sky-line);color:var(--text-mid);font-size:13px;
+    cursor:pointer;transition:.2s;
+  }
+  .filter-tab.active, .filter-tab:hover{background:var(--sky-panel-2);border-color:var(--horizon-violet);color:var(--text-hi);}
+
+  /* Grid & Cards */
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  @media(max-width:920px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--sky-panel);border:1px solid var(--sky-line);
+    border-radius:16px;padding:22px;transition:.25s;
+    position:relative;overflow:hidden;display:flex;flex-direction:column;
+  }
+  .card:hover{border-color:rgba(44,62,80,0.3);transform:translateY(-3px);background:var(--sky-panel-2);}
+  .card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .card-tag{
+    font-size:10px;text-transform:uppercase;letter-spacing:.08em;
+    padding:4px 8px;border-radius:6px;background:rgba(255,255,255,0.05);
+    color:var(--gold);border:1px solid rgba(44,62,80,0.2);
+  }
+  .stock-badge{font-size:11px;color:var(--success);display:flex;align-items:center;gap:4px;}
+  .stock-dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
+
+  .card-icon{
+    width:52px;height:52px;border-radius:14px;
+    background:var(--sky-panel-2);display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;font-family:'Unbounded';
+    margin-bottom:16px;border:1px solid var(--sky-line);overflow:hidden;
+  }
+  .logo-mask{
+    width:56%;height:56%;background:var(--text-hi);
+    -webkit-mask-size:contain;mask-size:contain;
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+    -webkit-mask-position:center;mask-position:center;
+  }
+  .card-icon.disney{background:#0d47c7;font-family:'Unbounded';font-weight:700;color:#fff;font-size:16px;}
+  .card-name{font-size:16px;font-weight:700;margin-bottom:4px;}
+  .card-price{font-family:'JetBrains Mono';font-size:14px;color:var(--gold);margin-bottom:18px;}
+  .card-price span{color:var(--text-low);font-size:12px;}
+  .btn-card{
+    width:100%;padding:11px;border-radius:9px;margin-top:auto;
+    background:transparent;border:1px solid var(--sky-line);
+    color:var(--text-hi);font-size:13px;font-weight:600;transition:.2s;
+  }
+  .btn-card.added{background:var(--success) !important;color:#ffffff !important;border-color:var(--success) !important;}
+  .card:hover .btn-card{background:var(--horizon-orange);color:#ffffff;border-color:var(--horizon-orange);}
+
+  /* FAQ Accordion */
+  .faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
+  .faq-item{
+    background:var(--sky-panel);border:1px solid var(--sky-line);
+    border-radius:14px;overflow:hidden;transition:.2s;
+  }
+  .faq-question{
+    padding:18px 22px;font-weight:600;font-size:15px;
+    display:flex;justify-content:space-between;align-items:center;cursor:pointer;
+  }
+  .faq-answer{
+    padding:0 22px 18px;color:var(--text-mid);font-size:14px;
+    line-height:1.6;display:none;
+  }
+  .faq-item.open .faq-answer{display:block;}
+  .faq-item.open .faq-icon{transform:rotate(180deg);}
+  .faq-icon{transition:.2s;color:var(--text-low);}
+
+  /* Testimonials & Form */
+  .reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+  @media(max-width:768px){.reviews-grid{grid-template-columns:1fr;}}
+  .review-card{
+    background:var(--sky-panel);border:1px solid var(--sky-line);
+    border-radius:16px;padding:22px;
+  }
+  .review-stars{color:var(--gold);margin-bottom:8px;font-size:14px;}
+  .review-text{color:var(--text-mid);font-size:13.5px;line-height:1.5;margin-bottom:14px;}
+  .review-user{font-size:12.5px;font-weight:600;color:var(--text-hi);}
+
+  .add-review-box{
+    max-width:600px;margin:0 auto;background:var(--sky-panel);
+    border:1px solid var(--sky-line);border-radius:16px;padding:28px;
+  }
+  .add-review-box h3{font-family:'Unbounded';font-size:18px;margin-bottom:16px;text-align:center;}
+  .review-form-group{margin-bottom:16px;}
+  .review-form-group label{display:block;font-size:13px;color:var(--text-mid);margin-bottom:6px;}
+  .review-form-input, .review-form-textarea, .review-form-select{
+    width:100%;padding:12px;border-radius:10px;background:var(--sky-panel-2);
+    border:1px solid var(--sky-line);color:var(--text-hi);font-size:14px;outline:none;
+  }
+  .review-form-input:focus, .review-form-textarea:focus, .review-form-select:focus{border-color:var(--horizon-violet);}
+
+  /* Stats */
+  .stats{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--sky-line);border:1px solid var(--sky-line);
+    border-radius:16px;overflow:hidden;
+  }
+  @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr);}}
+  .stat{background:var(--sky-panel);padding:26px 20px;text-align:center;}
+  .stat-num{font-family:'Unbounded';font-size:26px;font-weight:700;color:var(--text-hi);}
+  .stat-label{font-size:11.5px;color:var(--text-low);text-transform:uppercase;letter-spacing:.06em;margin-top:6px;}
+
+  /* Banner */
+  .banner{
+    background:linear-gradient(120deg, rgba(44,62,80,0.08), rgba(26,37,47,0.04));
+    border:1px solid var(--sky-line);border-radius:20px;padding:48px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:20px;flex-wrap:wrap;
+  }
+  .banner h3{font-family:'Unbounded';font-size:24px;margin-bottom:8px;}
+  .banner p{color:var(--text-mid);font-size:14px;}
+
+  footer{
+    border-top:1px solid var(--sky-line);padding:0;
+    color:var(--text-low);font-size:13px;
+  }
+  .footer-main{
+    max-width:1180px;margin:0 auto;padding:48px 48px 32px;
+    display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:32px;
+  }
+  @media(max-width:768px){.footer-main{grid-template-columns:1fr 1fr;}}
+  .footer-brand-mark{display:flex;align-items:center;gap:10px;font-family:'Unbounded';font-weight:700;font-size:15px;color:var(--text-hi);margin-bottom:12px;}
+  .footer-brand-img{width:26px;height:26px;border-radius:7px;object-fit:cover;}
+  .footer-desc{font-size:13px;line-height:1.6;max-width:280px;margin-bottom:16px;}
+  .footer-socials{display:flex;gap:10px;}
+  .footer-social-btn{
+    width:34px;height:34px;border-radius:9px;border:1px solid var(--sky-line);
+    display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;
+  }
+  .footer-social-btn:hover{border-color:var(--horizon-violet);color:var(--text-hi);}
+  .footer-col h5{font-size:12px;color:var(--text-hi);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;}
+  .footer-col a, .footer-col span{display:block;font-size:13px;color:var(--text-low);margin-bottom:10px;transition:.2s;cursor:pointer;}
+  .footer-col a:hover{color:var(--text-hi);}
+  .footer-bottom{
+    border-top:1px solid var(--sky-line);padding:20px 48px;
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:10px;font-size:12.5px;max-width:1180px;margin:0 auto;
+  }
+
+  /* Cart button */
+  .cart-btn{display:flex;align-items:center;gap:8px;}
+  .cart-count{
+    background:var(--horizon-violet);color:#fff;
+    font-size:11px;font-weight:700;min-width:18px;height:18px;
+    border-radius:100px;display:inline-flex;align-items:center;justify-content:center;
+    padding:0 5px;
+  }
+
+  /* Overlays */
+  .overlay{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(26,29,32,0.4);backdrop-filter:blur(6px);
+    display:none;justify-content:flex-end;
+  }
+  .overlay.open{display:flex;}
+  .panel{
+    width:440px;max-width:92vw;height:100%;
+    background:var(--sky-panel);border-left:1px solid var(--sky-line);
+    display:flex;flex-direction:column;animation:slideIn .25s ease;
+  }
+  @keyframes slideIn{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+  .panel-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 24px;border-bottom:1px solid var(--sky-line);
+  }
+  .panel-header h3{font-family:'Unbounded';font-size:17px;font-weight:600;}
+  .panel-close{
+    width:32px;height:32px;border-radius:9px;
+    background:var(--sky-panel-2);border:1px solid var(--sky-line);
+    color:var(--text-mid);font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .panel-close:hover{color:var(--text-hi);}
+  .panel-body{flex:1;overflow-y:auto;padding:20px 24px;}
+  .panel-footer{padding:20px 24px;border-top:1px solid var(--sky-line);}
+
+  /* Cart items */
+  .cart-item{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 0;border-bottom:1px solid var(--sky-line);
+  }
+  .cart-item:last-child{border-bottom:none;}
+  .cart-item-icon{
+    width:40px;height:40px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--sky-line);overflow:hidden;
+  }
+  .cart-item-icon .logo-mask{width:56%;height:56%;background:var(--text-hi);-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;}
+  .cart-item-info{flex:1;min-width:0;}
+  .cart-item-name{font-size:14px;font-weight:600;}
+  .cart-item-price{font-family:'JetBrains Mono';font-size:12px;color:var(--gold);margin-top:2px;}
+  .qty-control{display:flex;align-items:center;gap:8px;}
+  .qty-btn{
+    width:24px;height:24px;border-radius:7px;
+    background:var(--sky-panel-2);border:1px solid var(--sky-line);
+    color:var(--text-hi);font-size:14px;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .qty-val{font-family:'JetBrains Mono';font-size:13px;min-width:16px;text-align:center;}
+  .remove-btn{color:var(--text-low);font-size:16px;margin-left:6px;background:transparent;}
+  .remove-btn:hover{color:var(--horizon-orange);}
+  .cart-empty{text-align:center;color:var(--text-low);font-size:14px;padding:60px 10px;}
+  .cart-total-row{display:flex;justify-content:space-between;align-items:center;font-size:15px;margin-bottom:16px;}
+  .cart-total-row b{font-family:'JetBrains Mono';color:var(--text-hi);font-size:17px;}
+  .btn-full{width:100%;justify-content:center;display:flex;align-items:center;}
+  .btn-full:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* Checkout summary list */
+  .order-summary-box{
+    background:var(--sky-panel-2);border:1px solid var(--sky-line);
+    border-radius:12px;padding:12px 16px;margin-bottom:16px;
+  }
+  .summary-item{
+    display:flex;justify-content:space-between;font-size:13px;
+    padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .summary-item:last-child{border-bottom:none;}
+  .summary-item span{color:var(--text-mid);}
+  .summary-item b{font-family:'JetBrains Mono';color:var(--gold);}
+
+  /* Checkout */
+  .pay-method{
+    display:flex;align-items:center;gap:12px;padding:16px;border-radius:12px;
+    border:1px solid var(--horizon-violet);background:rgba(44,62,80,0.05);margin-bottom:16px;
+  }
+  .pay-method-icon{font-size:22px;}
+  .pay-method-name{font-weight:700;font-size:14.5px;}
+  .pay-method-desc{color:var(--text-low);font-size:12px;margin-top:2px;}
+
+  .pay-details{
+    background:var(--sky-panel-2);border:1px solid var(--sky-line);
+    border-radius:12px;padding:16px;margin-bottom:16px;
+  }
+  .pay-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:9px 0;border-bottom:1px solid var(--sky-line);
+    font-size:13.5px;gap:10px;
+  }
+  .pay-row:last-child{border-bottom:none;}
+  .pay-row span{color:var(--text-low);}
+  .pay-row b{font-family:'JetBrains Mono';font-weight:500;}
+  .copy-btn{
+    font-size:11px;color:var(--horizon-violet);background:transparent;
+    border:1px solid var(--sky-line);padding:4px 9px;border-radius:7px;
+    flex-shrink:0;transition:.2s;
+  }
+  .copy-btn:hover{border-color:var(--horizon-violet);background:rgba(44,62,80,0.08);}
+  .pay-note{font-size:12.5px;color:var(--text-mid);line-height:1.6;margin-bottom:20px;}
+
+  .order-status{border-top:1px dashed var(--sky-line);padding-top:20px;}
+  .order-status-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-low);margin-bottom:14px;}
+
+  /* Cupón */
+  .coupon-row{display:flex;gap:8px;margin-bottom:6px;}
+  .coupon-input{
+    flex:1;padding:11px 14px;border-radius:9px;
+    background:var(--sky-panel-2);border:1px solid var(--sky-line);
+    color:var(--text-hi);font-size:13px;outline:none;text-transform:uppercase;
+  }
+  .coupon-input:focus{border-color:var(--horizon-violet);}
+  .coupon-msg{font-size:12px;min-height:18px;margin-bottom:14px;}
+  .coupon-msg.ok{color:var(--success);}
+  .coupon-msg.err{color:#F26A6A;}
+
+  /* Rastreo de pedido */
+  .track-form{display:flex;gap:8px;margin-bottom:20px;}
+  .track-input{
+    flex:1;padding:12px 14px;border-radius:9px;
+    background:var(--sky-panel-2);border:1px solid var(--sky-line);
+    color:var(--text-hi);font-size:13px;outline:none;text-transform:uppercase;
+  }
+  .track-input:focus{border-color:var(--horizon-violet);}
+  .track-result{display:none;}
+  .track-result.show{display:block;}
+  .track-empty{color:var(--text-low);font-size:13px;text-align:center;padding:20px 0;}
+  .track-order-code{font-family:'JetBrains Mono';color:var(--gold);font-size:15px;margin-bottom:4px;}
+  .track-order-items{color:var(--text-mid);font-size:13px;margin-bottom:20px;line-height:1.6;}
+  .order-code-row{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--sky-panel-2);border:1px solid var(--sky-line);
+    border-radius:10px;padding:12px 14px;margin-bottom:18px;
+  }
+  .order-code-label{font-size:11px;color:var(--text-low);margin-bottom:3px;}
+  .order-code-val{font-family:'JetBrains Mono';font-size:15px;letter-spacing:.03em;color:var(--gold);}
+
+  .stepper{display:flex;align-items:flex-start;margin-bottom:16px;}
+  .step-item{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;}
+  .step-dot{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--sky-panel-2);border:1px solid var(--sky-line);
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;color:var(--text-low);margin-bottom:8px;
+    transition:.3s;position:relative;z-index:1;
+  }
+  .step-connector{position:absolute;top:13px;left:50%;width:100%;height:2px;background:var(--sky-line);z-index:0;}
+  .step-item:first-child .step-connector{display:none;}
+  .step-label{font-size:11px;color:var(--text-low);line-height:1.4;max-width:90px;}
+  .step-item.active .step-dot{
+    background:var(--horizon-violet);border-color:var(--horizon-violet);color:#fff;
+    box-shadow:0 0 0 4px rgba(44,62,80,0.15);
+  }
+  .step-item.active .step-label{color:var(--text-hi);font-weight:600;}
+  .step-item.active .step-connector{background:var(--horizon-violet);}
+  .step-item.done .step-dot{background:var(--success);border-color:var(--success);color:#ffffff;}
+  .step-item.done .step-connector{background:var(--success);}
+  .step-item.done .step-label{color:var(--text-mid);}
+  .step-item.pulse .step-dot{animation:pulse-dot 1.6s infinite;}
+  @keyframes pulse-dot{
+    0%,100%{box-shadow:0 0 0 4px rgba(44,62,80,0.15);}
+    50%{box-shadow:0 0 0 8px rgba(44,62,80,0.05);}
+  }
+  .status-note{font-size:12px;color:var(--text-low);text-align:center;margin-top:16px;line-height:1.6;}
+  .status-note b{color:var(--text-mid);}
+</style>
+</head>
+<body>
+
+<div class="glow-field"></div>
+<div id="toastContainer" class="toast-container"></div>
+
+<header>
+  <a href="#" class="brand">
+    <img src="skyline-logo-icon.png" alt="Skyline Store" class="brand-mark-img">
+  </a>
+  <nav>
+    <a href="#tienda">Tienda</a>
+    <a href="#testimonios">Reseñas</a>
+    <a href="#faq">Preguntas</a>
+    <a href="#" id="openTrack">Rastrear pedido</a>
+  </nav>
+  <div class="nav-right">
+    <button id="openCart" class="btn-ghost cart-btn">🛒 Carrito <span id="cartCount" class="cart-count">0</span></button>
+    <a href="https://discord.gg/B3wp4Ygv8J" target="_blank" class="btn-discord">Discord</a>
+  </div>
+</header>
+
+<div class="hero">
+  <p class="hero-kicker">🎮 store por Discord, sin vueltas</p>
+  <h1 class="hero-title"><img src="skyline-logo-hero.jpg" alt="Skyline Store" class="hero-logo"></h1>
+  <p class="hero-sub">Netflix, Spotify, Disney+, cuentas de juegos... lo que necesites. Comprás, transferís y en un rato ya tenés todo listo.</p>
+  <div class="hero-ctas">
+    <a href="#tienda" class="btn-primary">Ver catálogo</a>
+    <a href="#faq" class="btn-secondary">Preguntas frecuentes</a>
+  </div>
+  <div class="trust-row">
+    <div class="trust-pill">Entrega en el día</div>
+    <div class="trust-pill">Te reponemos si falla algo</div>
+    <div class="trust-pill">Staff en Discord</div>
+  </div>
+</div>
+
+<section id="como-funciona">
+  <div class="section-head">
+    <h2 class="section-title">¿Cómo funciona?</h2>
+    <p class="section-desc">Cuatro pasos, nada complicado.</p>
+  </div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">1</div>
+      <h4>Elegís lo que querés</h4>
+      <p>Buscás en el catálogo y lo tirás al carrito, podés meter varias cosas juntas.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">2</div>
+      <h4>Transferís</h4>
+      <p>Te pasamos alias y el monto justo, hacés la transferencia y ya está.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">3</div>
+      <h4>Abrís un ticket</h4>
+      <p>Copiás el resumen y lo pegás en Discord junto con el comprobante.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-num">4</div>
+      <h4>Te llega la cuenta</h4>
+      <p>Alguien del staff chequea el pago y te tira los datos ahí mismo.</p>
+    </div>
+  </div>
+</section>
+
+<section id="tienda">
+  <div class="section-head">
+    <h2 class="section-title">Catálogo</h2>
+    <p class="section-desc">Buscá lo que necesitás y agregalo al carrito.</p>
+  </div>
+
+  <div class="catalog-controls">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Buscar servicio...">
+    </div>
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-cat="all">Todos</button>
+      <button class="filter-tab" data-cat="streaming">Streaming</button>
+      <button class="filter-tab" data-cat="juegos">Juegos</button>
+      <button class="filter-tab" data-cat="vpn">VPN</button>
+      <button class="filter-tab" data-cat="ia">IA</button>
+      <button class="filter-tab" data-cat="musica">Música</button>
+      <button class="filter-tab" data-cat="anime">Anime</button>
+    </div>
+  </div>
+
+  <div class="grid" id="productGrid">
+    <!-- Steam -->
+    <div class="card" data-cat="juegos" data-name="Steam Account" data-price="30" data-icon-bg="#171a21" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg" data-icon-fill="#fff">
+      <div class="card-top">
+        <div class="card-tag">Full Access (30-60 días)</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 14 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#171a21;">
+        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg');"></div>
+      </div>
+      <div class="card-name">Steam Account</div>
+      <div class="card-price">$30 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- Rockstar -->
+    <div class="card" data-cat="juegos" data-name="Rockstar Account" data-price="250" data-icon-bg="#fcaf17" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg" data-icon-fill="#000">
+      <div class="card-top">
+        <div class="card-tag">FiveM Fresh (No GTA V)</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 6 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#fcaf17;">
+        <div class="logo-mask" style="background:#000;-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg');"></div>
+      </div>
+      <div class="card-name">Rockstar Account</div>
+      <div class="card-price">$250 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- Discord -->
+    <div class="card" data-cat="juegos" data-name="Discord Account" data-price="250" data-icon-bg="#5865F2" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg" data-icon-fill="#fff">
+      <div class="card-top">
+        <div class="card-tag">Full Access + Mail</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 22 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#5865F2;">
+        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg');"></div>
+      </div>
+      <div class="card-name">Discord Account</div>
+      <div class="card-price">$250 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- IPVanish -->
+    <div class="card" data-cat="vpn" data-name="IPVanish VPN" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg" data-icon-fill="#44B035">
+      <div class="card-top">
+        <div class="card-tag">NFA Premium</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 9 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#000;">
+        <div class="logo-mask" style="background:#44B035;-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg');"></div>
+      </div>
+      <div class="card-name">IPVanish VPN</div>
+      <div class="card-price">$1.000 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- NordVPN -->
+    <div class="card" data-cat="vpn" data-name="NordVPN Account" data-price="2000" data-icon-bg="#4687FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg" data-icon-fill="#fff">
+      <div class="card-top">
+        <div class="card-tag">NFA Premium</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 5 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#4687FF;">
+        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg');"></div>
+      </div>
+      <div class="card-name">NordVPN Account</div>
+      <div class="card-price">$2.000 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- ChatGPT Plus -->
+    <div class="card" data-cat="ia" data-name="ChatGPT Plus" data-price="6000" data-icon-bg="#10a37f" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg" data-icon-fill="#fff">
+      <div class="card-top">
+        <div class="card-tag">Full Access (Mail:Clave)</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 11 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#10a37f;">
+        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg');"></div>
+      </div>
+      <div class="card-name">ChatGPT Plus</div>
+      <div class="card-price">$6.000 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- Disney+ -->
+    <div class="card" data-cat="streaming" data-name="Disney+" data-price="1000" data-icon-color="disney" data-icon-content="D+">
+      <div class="card-top">
+        <div class="card-tag">NFA</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 18 disponibles</div>
+      </div>
+      <div class="card-icon disney">D+</div>
+      <div class="card-name">Disney+</div>
+      <div class="card-price">$1.000 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- Netflix -->
+    <div class="card" data-cat="streaming" data-name="Netflix" data-price="3000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg" data-icon-fill="#E50914">
+      <div class="card-top">
+        <div class="card-tag">Acceso Vitalicio</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 27 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#000;">
+        <div class="logo-mask" style="background:#E50914;-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg');"></div>
+      </div>
+      <div class="card-name">Netflix</div>
+      <div class="card-price">$3.000 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- HBO Max -->
+    <div class="card" data-cat="streaming" data-name="HBO Max" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg" data-icon-fill="#fff">
+      <div class="card-top">
+        <div class="card-tag">NFA</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 8 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#000;">
+        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg');"></div>
+      </div>
+      <div class="card-name">HBO Max</div>
+      <div class="card-price">$1.000 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- Crunchyroll -->
+    <div class="card" data-cat="anime" data-name="Crunchyroll" data-price="1250" data-icon-bg="#F47521" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg" data-icon-fill="#fff">
+      <div class="card-top">
+        <div class="card-tag">NFA</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 4 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#F47521;">
+        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg');"></div>
+      </div>
+      <div class="card-name">Crunchyroll</div>
+      <div class="card-price">$1.250 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- Paramount+ -->
+    <div class="card" data-cat="streaming" data-name="Paramount+" data-price="1500" data-icon-bg="#0064FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg" data-icon-fill="#fff">
+      <div class="card-top">
+        <div class="card-tag">NFA</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 12 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#0064FF;">
+        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg');"></div>
+      </div>
+      <div class="card-name">Paramount+</div>
+      <div class="card-price">$1.500 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+
+    <!-- Spotify -->
+    <div class="card" data-cat="musica" data-name="Spotify" data-price="3500" data-icon-bg="#1DB954" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg" data-icon-fill="#fff">
+      <div class="card-top">
+        <div class="card-tag">FA (Full Access)</div>
+        <div class="stock-badge"><span class="stock-dot"></span> 16 disponibles</div>
+      </div>
+      <div class="card-icon" style="background:#1DB954;">
+        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg');"></div>
+      </div>
+      <div class="card-name">Spotify</div>
+      <div class="card-price">$3.500 <span>Ars / cuenta</span></div>
+      <button class="btn-card add-cart-btn">Agregar al carrito</button>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="stats">
+    <div class="stat"><div class="stat-num">+2 min</div><div class="stat-label">Entrega promedio</div></div>
+    <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Soporte activo</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Garantía de reemplazo</div></div>
+    <div class="stat"><div class="stat-num">+12</div><div class="stat-label">Productos disponibles</div></div>
+  </div>
+</section>
+
+<!-- Reseñas -->
+<section id="testimonios">
+  <div class="section-head">
+    <h2 class="section-title">Lo que dicen los clientes</h2>
+    <p class="section-desc">Reseñas de gente que ya compró.</p>
+  </div>
+  
+  <div class="reviews-grid" id="reviewsContainer">
+    <!-- Carga desde Supabase -->
+  </div>
+
+  <div class="add-review-box">
+    <h3>Dejá tu opinión</h3>
+    <form id="reviewForm">
+      <div class="review-form-group">
+        <label>Tu Usuario (Ej: @Usuario_99)</label>
+        <input type="text" id="revUser" class="review-form-input" placeholder="@usuario" required>
+      </div>
+      <div class="review-form-group">
+        <label>Puntuación</label>
+        <select id="revStars" class="review-form-select">
+          <option value="5">★★★★★ (5 estrellas)</option>
+          <option value="4">★★★★☆ (4 estrellas)</option>
+          <option value="3">★★★☆☆ (3 estrellas)</option>
+          <option value="2">★★☆☆☆ (2 estrellas)</option>
+          <option value="1">★☆☆☆☆ (1 estrella)</option>
+        </select>
+      </div>
+      <div class="review-form-group">
+        <label>Tu Comentario</label>
+        <textarea id="revComment" class="review-form-textarea" rows="3" placeholder="Contanos tu experiencia..." required></textarea>
+      </div>
+      <button type="submit" class="btn-primary btn-full">Publicar Reseña</button>
+    </form>
+  </div>
+</section>
+
+<!-- Preguntas Frecuentes -->
+<section id="faq">
+  <div class="section-head">
+    <h2 class="section-title">Preguntas frecuentes</h2>
+    <p class="section-desc">Lo que más nos preguntan antes de comprar.</p>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-question"><span>¿Cómo recibo los datos de mi cuenta?</span><span class="faq-icon">▼</span></div>
+      <div class="faq-answer">Cuando pagás, copiás el resumen de tu pedido y abrís un ticket en Discord con el comprobante. De ahí lo toma el staff y te pasa los datos.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question"><span>¿Qué significa NFA / FA?</span><span class="faq-icon">▼</span></div>
+      <div class="faq-answer"><b>FA (Full Access)</b> podés cambiarle el correo y la clave, queda 100% tuya. <b>NFA (No Full Access)</b> la usás tal cual te la pasamos, sin tocar nada.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question"><span>¿Tienen garantía las cuentas?</span><span class="faq-icon">▼</span></div>
+      <div class="faq-answer">Sí. Si te falla algo dentro del período que corresponde, te la cambiamos sin drama, avisá nomás por el ticket.</div>
+    </div>
+  </div>
+</section>
+
+<section id="soporte">
+  <div class="banner">
+    <div>
+      <h3>¿Te quedó alguna duda?</h3>
+      <p>Escribinos por Discord, siempre hay alguien del staff para responderte.</p>
+    </div>
+    <a href="https://discord.gg/B3wp4Ygv8J" target="_blank" class="btn-primary">Unirme al Discord</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-mark"><img src="skyline-logo-icon.png" alt="Skyline Store" class="footer-brand-img"> Skyline Store</div>
+      <p class="footer-desc">Arrancamos vendiendo entre amigos y de a poco se fue armando esto. Todo se maneja acá, por Discord, sin call center ni nada raro.</p>
+      <div class="footer-socials">
+        <a href="https://discord.gg/B3wp4Ygv8J" target="_blank" class="footer-social-btn" title="Discord">💬</a>
+        <a href="#" class="footer-social-btn" title="Instagram">📷</a>
+        <a href="#" class="footer-social-btn" title="TikTok">🎵</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Tienda</h5>
+      <a href="#tienda">Catálogo</a>
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#" id="footerTrackLink">Rastrear pedido</a>
+    </div>
+    <div class="footer-col">
+      <h5>Ayuda</h5>
+      <a href="#faq">Preguntas frecuentes</a>
+      <a href="#testimonios">Reseñas</a>
+      <a href="https://discord.gg/B3wp4Ygv8J" target="_blank">Hablar con el staff</a>
+    </div>
+    <div class="footer-col">
+      <h5>Legal</h5>
+      <span>No tenemos nada que ver con Netflix, Disney, HBO ni las demás marcas de la lista.</span>
+      <span>La garantía de reposición se maneja por Discord.</span>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Skyline Store</div>
+    <div>Manejado por gente de acá, no por una empresa 🇦🇷</div>
+  </div>
+</footer>
+
+<!-- ===== Carrito Panel ===== -->
+<div id="cartOverlay" class="overlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h3>Tu carrito</h3>
+      <button class="panel-close" id="closeCart">✕</button>
+    </div>
+    <div class="panel-body" id="cartItems">
+      <div class="cart-empty">Tu carrito está vacío.<br>Agregá alguna cuenta del catálogo.</div>
+    </div>
+    <div class="panel-footer">
+      <div class="cart-total-row"><span>Total</span><b id="cartTotal">$0 Ars</b></div>
+      <button class="btn-primary btn-full" id="goCheckout" disabled>Continuar a pago</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Checkout Panel ===== -->
+<div id="checkoutOverlay" class="overlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h3>Pago</h3>
+      <button class="panel-close" id="closeCheckout">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="pay-method">
+        <div class="pay-method-icon">🏦</div>
+        <div>
+          <div class="pay-method-name">Transferencia bancaria</div>
+          <div class="pay-method-desc">Único método disponible</div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;color:var(--text-low);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;">Resumen de tu pedido</div>
+      <div class="order-summary-box" id="checkoutSummary"></div>
+
+      <div class="coupon-row">
+        <input type="text" id="couponInput" class="coupon-input" placeholder="Código de cupón (opcional)">
+        <button class="btn-ghost" id="applyCouponBtn" type="button">Aplicar</button>
+      </div>
+      <div class="coupon-msg" id="couponMsg"></div>
+
+      <div class="pay-details">
+        <div class="pay-row">
+          <span>Alias</span>
+          <b id="aliasVal">ssegoovia1</b>
+          <button class="copy-btn" data-copy="ssegoovia1">Copiar</button>
+        </div>
+        <div class="pay-row">
+          <span>Titular</span>
+          <b>Fausto Segovia</b>
+        </div>
+        <div class="pay-row">
+          <span>Monto a transferir</span>
+          <b id="checkoutTotal">$0 Ars</b>
+          <button class="copy-btn" id="copyAmountBtn">Copiar</button>
+        </div>
+      </div>
+
+      <p class="pay-note">Hacé la transferencia por el monto exacto. Al finalizar, hacé clic abajo para copiar tu resumen y abrir Discord para enviar tu comprobante en el ticket.</p>
+
+      <div style="margin-bottom:24px;">
+        <a id="btnDiscordTicket" href="https://discord.gg/B3wp4Ygv8J" target="_blank" class="btn-primary btn-full">
+          💬 Copiar Resumen y Abrir Discord
+        </a>
+      </div>
+
+      <div class="order-status">
+        <div class="order-status-label">Estado de tu pedido</div>
+
+        <div class="order-code-row">
+          <div>
+            <div class="order-code-label">Código de pedido</div>
+            <div class="order-code-val" id="orderCode">—</div>
+          </div>
+          <button class="copy-btn" id="copyOrderCode">Copiar</button>
+        </div>
+
+        <div class="stepper">
+          <div class="step-item active pulse">
+            <div class="step-connector"></div>
+            <div class="step-dot">1</div>
+            <div class="step-label">Transferencia enviada</div>
+          </div>
+          <div class="step-item">
+            <div class="step-connector"></div>
+            <div class="step-dot">2</div>
+            <div class="step-label">Comprobante recibido</div>
+          </div>
+          <div class="step-item">
+            <div class="step-connector"></div>
+            <div class="step-dot">3</div>
+            <div class="step-label">Confirmado por staff</div>
+          </div>
+        </div>
+
+        <p class="status-note">La confirmación final la realiza un miembro del equipo en tu ticket de Discord tras verificar el pago.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Rastrear Pedido Panel ===== -->
+<div id="trackOverlay" class="overlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h3>Rastrear pedido</h3>
+      <button class="panel-close" id="closeTrack">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="track-form">
+        <input type="text" id="trackInput" class="track-input" placeholder="Ej: SKY-4F82A1">
+        <button class="btn-primary" id="trackBtn" type="button">Buscar</button>
+      </div>
+      <div id="trackResult">
+        <div class="track-empty">Ingresá tu código de pedido para ver el estado.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// --- CONEXIÓN SUPABASE ---
+const SUPABASE_URL = 'https://ahtotguqbvhsxqbijgxa.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2r5BYlqRe1uJbs_aKp1FCA_DLWEy0cC';
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Cargar reseñas desde Supabase
+async function loadReviews() {
+  const container = document.getElementById('reviewsContainer');
+  const { data, error } = await db.from('reviews').select('*').order('id', { ascending: false });
+  
+  if (error) {
+    console.error(error);
+    container.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-low);">Error al cargar las reseñas.</p>';
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-low);">Aún no hay opiniones. ¡Sé el primero en dejar la tuya!</p>';
+    return;
+  }
+
+  container.innerHTML = data.map(r => `
+    <div class="review-card">
+      <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+      <p class="review-text">"${r.comment}"</p>
+      <div class="review-user">${r.username}</div>
+    </div>
+  `).join('');
+}
+
+// Guardar nueva reseña
+document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('revUser').value.trim();
+  const stars = parseInt(document.getElementById('revStars').value, 10);
+  const comment = document.getElementById('revComment').value.trim();
+
+  const { error } = await db.from('reviews').insert([{ username, stars, comment }]);
+
+  if (error) {
+    showToast('Error al publicar reseña');
+    console.error(error);
+  } else {
+    showToast('¡Reseña publicada con éxito!');
+    document.getElementById('reviewForm').reset();
+    loadReviews();
+  }
+});
+
+// Cargar al iniciar
+loadReviews();
+
+// --- LÓGICA DE TIENDA Y CARRITO ---
+(function(){
+  let cart = [];
+  let currentOrderCode = null;
+
+  function genOrderCode(){
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = 'SKY-';
+    for(let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
+    return code;
+  }
+
+  window.showToast = function(msg){
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = '✨ ' + msg;
+    container.appendChild(toast);
+    setTimeout(()=> toast.remove(), 3000);
+  };
+
+  const cartOverlay = document.getElementById('cartOverlay');
+  const checkoutOverlay = document.getElementById('checkoutOverlay');
+  const cartItemsEl = document.getElementById('cartItems');
+  const cartTotalEl = document.getElementById('cartTotal');
+  const checkoutTotalEl = document.getElementById('checkoutTotal');
+  const cartCountEl = document.getElementById('cartCount');
+  const goCheckoutBtn = document.getElementById('goCheckout');
+  const checkoutSummaryEl = document.getElementById('checkoutSummary');
+  const copyAmountBtn = document.getElementById('copyAmountBtn');
+  const btnDiscordTicket = document.getElementById('btnDiscordTicket');
+
+  function fmt(n){ return '$' + n.toLocaleString('es-AR') + ' Ars'; }
+
+  function buildIconHTML(card){
+    if(card.dataset.iconColor === 'disney'){
+      return '<div class="card-icon disney" style="width:100%;height:100%;margin:0;border-radius:0;border:none;">'+card.dataset.iconContent+'</div>';
+    }
+    const bg = card.dataset.iconBg || '#000';
+    const mask = card.dataset.iconMask;
+    const fill = card.dataset.iconFill || '#fff';
+    return '<div style="width:100%;height:100%;background:'+bg+';display:flex;align-items:center;justify-content:center;">'
+      + '<div class="logo-mask" style="background:'+fill+';-webkit-mask-image:url(\''+mask+'\');mask-image:url(\''+mask+'\');"></div>'
+      + '</div>';
+  }
+
+  // Búsqueda y Filtros
+  const searchInput = document.getElementById('searchInput');
+  const filterTabs = document.querySelectorAll('.filter-tab');
+
+  function filterCatalog(){
+    const query = searchInput.value.toLowerCase();
+    const activeTab = document.querySelector('.filter-tab.active').dataset.cat;
+    const allCards = document.querySelectorAll('.card');
+
+    allCards.forEach(card=>{
+      const name = card.dataset.name.toLowerCase();
+      const cat = card.dataset.cat;
+      const matchesSearch = name.includes(query);
+      const matchesCat = activeTab === 'all' || cat === activeTab;
+
+      if(matchesSearch && matchesCat){
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  searchInput.addEventListener('input', filterCatalog);
+  filterTabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      filterTabs.forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+      filterCatalog();
+    });
+  });
+
+  // Agregar al carrito (delegación de eventos)
+  document.getElementById('productGrid').addEventListener('click', (e)=>{
+    const btn = e.target.closest('.add-cart-btn');
+    if(!btn) return;
+
+    const card = btn.closest('.card');
+    const name = card.dataset.name;
+    const price = parseInt(card.dataset.price, 10);
+    const existing = cart.find(i=>i.name===name);
+    if(existing){ existing.qty++; }
+    else { cart.push({name, price, qty:1, iconHTML: buildIconHTML(card)}); }
+    
+    showToast(`${name} agregado al carrito`);
+    renderCart();
+  });
+
+  function renderCart(){
+    const totalQty = cart.reduce((s,i)=>s+i.qty,0);
+    cartCountEl.textContent = totalQty;
+    
+    if(cart.length===0){
+      cartItemsEl.innerHTML = '<div class="cart-empty">Tu carrito está vacío.<br>Agregá alguna cuenta del catálogo.</div>';
+      goCheckoutBtn.disabled = true;
+      cartTotalEl.textContent = fmt(0);
+      return;
+    }
+    goCheckoutBtn.disabled = false;
+    let total = 0;
+    cartItemsEl.innerHTML = cart.map((item, idx)=>{
+      total += item.price * item.qty;
+      return '<div class="cart-item">'
+        + '<div class="cart-item-icon">'+item.iconHTML+'</div>'
+        + '<div class="cart-item-info">'
+          + '<div class="cart-item-name">'+item.name+'</div>'
+          + '<div class="cart-item-price">'+fmt(item.price)+' c/u</div>'
+        + '</div>'
+        + '<div class="qty-control">'
+          + '<button class="qty-btn" data-act="dec" data-idx="'+idx+'">−</button>'
+          + '<span class="qty-val">'+item.qty+'</span>'
+          + '<button class="qty-btn" data-act="inc" data-idx="'+idx+'">+</button>'
+        + '</div>'
+        + '<button class="remove-btn" data-act="rm" data-idx="'+idx+'">✕</button>'
+      + '</div>';
+    }).join('');
+    cartTotalEl.textContent = fmt(total);
+  }
+
+  cartItemsEl.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button[data-act]');
+    if(!btn) return;
+    const idx = parseInt(btn.dataset.idx, 10);
+    const act = btn.dataset.act;
+    if(act==='inc') cart[idx].qty++;
+    if(act==='dec'){ cart[idx].qty--; if(cart[idx].qty<=0) cart.splice(idx,1); }
+    if(act==='rm') cart.splice(idx,1);
+    renderCart();
+  });
+
+  function openCart(){ cartOverlay.classList.add('open'); }
+  function closeCart(){ cartOverlay.classList.remove('open'); }
+  document.getElementById('openCart').addEventListener('click', openCart);
+  document.getElementById('closeCart').addEventListener('click', closeCart);
+  cartOverlay.addEventListener('click', (e)=>{ if(e.target===cartOverlay) closeCart(); });
+
+  let couponDiscount = 0;
+  let appliedCoupon = null;
+
+  function checkoutTotalRaw(){
+    const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
+    return Math.max(0, Math.round(sub - couponDiscount));
+  }
+
+  async function openCheckout(){
+    couponDiscount = 0;
+    appliedCoupon = null;
+    document.getElementById('couponInput').value = '';
+    const couponMsgEl = document.getElementById('couponMsg');
+    couponMsgEl.textContent = '';
+    couponMsgEl.className = 'coupon-msg';
+
+    checkoutTotalEl.textContent = fmt(checkoutTotalRaw());
+    copyAmountBtn.dataset.copy = checkoutTotalRaw().toString();
+
+    checkoutSummaryEl.innerHTML = cart.map(i=> 
+      '<div class="summary-item"><span>'+i.qty+'x '+i.name+'</span><b>'+fmt(i.price * i.qty)+'</b></div>'
+    ).join('');
+
+    if(!currentOrderCode){
+      currentOrderCode = genOrderCode();
+      document.getElementById('orderCode').textContent = currentOrderCode;
+      document.getElementById('copyOrderCode').dataset.copy = currentOrderCode;
+    }
+
+    // Guarda el pedido en Supabase para poder rastrearlo (requiere tabla "orders")
+    try{
+      await db.from('orders').upsert({
+        code: currentOrderCode,
+        items: cart.map(i=>({ name:i.name, qty:i.qty, price:i.price })),
+        total: checkoutTotalRaw(),
+        status: 'pendiente'
+      }, { onConflict: 'code' });
+    }catch(err){ console.error('No se pudo guardar el pedido en Supabase:', err); }
+
+    closeCart();
+    checkoutOverlay.classList.add('open');
+  }
+
+  document.getElementById('applyCouponBtn').addEventListener('click', async ()=>{
+    const input = document.getElementById('couponInput');
+    const msgEl = document.getElementById('couponMsg');
+    const code = input.value.trim().toUpperCase();
+    if(!code){ return; }
+
+    try{
+      const { data, error } = await db.from('coupons').select('*').eq('code', code).maybeSingle();
+      if(error) throw error;
+
+      if(!data){
+        couponDiscount = 0; appliedCoupon = null;
+        msgEl.textContent = 'Cupón inválido o vencido.';
+        msgEl.className = 'coupon-msg err';
+      } else {
+        const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
+        couponDiscount = data.percent_off ? Math.round(sub * (data.percent_off/100)) : (data.amount_off || 0);
+        appliedCoupon = code;
+        msgEl.textContent = '¡Cupón aplicado! Descuento: ' + fmt(couponDiscount);
+        msgEl.className = 'coupon-msg ok';
+      }
+    }catch(err){
+      couponDiscount = 0; appliedCoupon = null;
+      msgEl.textContent = 'No se pudo validar el cupón. Probá de nuevo.';
+      msgEl.className = 'coupon-msg err';
+      console.error(err);
+    }
+
+    checkoutTotalEl.textContent = fmt(checkoutTotalRaw());
+    copyAmountBtn.dataset.copy = checkoutTotalRaw().toString();
+  });
+
+  btnDiscordTicket.addEventListener('click', ()=>{
+    let itemsText = cart.map(i => `${i.qty}x ${i.name}`).join(', ');
+    let total = checkoutTotalRaw();
+    let summaryText = `🛒 *NUEVO PEDIDO SKYLINE STORE*\n`
+                    + `• Código: ${currentOrderCode}\n`
+                    + `• Productos: ${itemsText}\n`
+                    + (appliedCoupon ? `• Cupón: ${appliedCoupon}\n` : '')
+                    + `• Total abonado: ${fmt(total)}\n`
+                    + `Adjunto mi comprobante de pago a continuación:`;
+
+    navigator.clipboard.writeText(summaryText);
+    showToast('Resumen copiado. Abrí el ticket en Discord y pegalo.');
+  });
+
+  function closeCheckout(){ checkoutOverlay.classList.remove('open'); }
+  goCheckoutBtn.addEventListener('click', openCheckout);
+  document.getElementById('closeCheckout').addEventListener('click', closeCheckout);
+  checkoutOverlay.addEventListener('click', (e)=>{ if(e.target===checkoutOverlay) closeCheckout(); });
+
+  // Accordion FAQ
+  document.querySelectorAll('.faq-question').forEach(q=>{
+    q.addEventListener('click', ()=>{
+      const item = q.parentElement;
+      item.classList.toggle('open');
+    });
+  });
+
+  // Copiar al portapapeles
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.copy-btn');
+    if(!btn || !btn.dataset.copy) return;
+    navigator.clipboard.writeText(btn.dataset.copy).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = 'Copiado ✓';
+      showToast('Texto copiado al portapapeles');
+      setTimeout(()=>{ btn.textContent = old; }, 1500);
+    });
+  });
+
+  // ===== Rastrear pedido =====
+  const trackOverlay = document.getElementById('trackOverlay');
+  const trackResultEl = document.getElementById('trackResult');
+  const trackInput = document.getElementById('trackInput');
+
+  const STATUS_STEP = { 'pendiente':1, 'comprobante_recibido':2, 'confirmado':3 };
+  const STATUS_LABEL = { 'pendiente':'Esperando comprobante', 'comprobante_recibido':'Comprobante recibido, en revisión', 'confirmado':'Confirmado y entregado' };
+
+  function renderTrackResult(order){
+    if(!order){
+      trackResultEl.innerHTML = '<div class="track-empty">No encontramos ningún pedido con ese código. Revisá que esté bien escrito.</div>';
+      return;
+    }
+    const step = STATUS_STEP[order.status] || 1;
+    const itemsText = (order.items || []).map(i => `${i.qty}x ${i.name}`).join(', ');
+    let stepsHTML = '';
+    ['Transferencia enviada','Comprobante recibido','Confirmado por staff'].forEach((label, idx)=>{
+      const n = idx+1;
+      const cls = n < step ? 'done' : (n === step ? 'active pulse' : '');
+      stepsHTML += '<div class="step-item '+cls+'"><div class="step-connector"></div><div class="step-dot">'+n+'</div><div class="step-label">'+label+'</div></div>';
+    });
+
+    trackResultEl.innerHTML =
+      '<div class="track-order-code">'+order.code+'</div>'
+      + '<div class="track-order-items">'+itemsText+' — Total: '+fmt(order.total)+'</div>'
+      + '<div class="stepper">'+stepsHTML+'</div>'
+      + '<p class="status-note"><b>Estado:</b> '+(STATUS_LABEL[order.status] || order.status)+'</p>';
+  }
+
+  async function trackOrder(){
+    const code = trackInput.value.trim().toUpperCase();
+    if(!code){ return; }
+    trackResultEl.innerHTML = '<div class="track-empty">Buscando pedido...</div>';
+    try{
+      const { data, error } = await db.from('orders').select('*').eq('code', code).maybeSingle();
+      if(error) throw error;
+      renderTrackResult(data);
+    }catch(err){
+      console.error(err);
+      trackResultEl.innerHTML = '<div class="track-empty">No pudimos consultar el pedido en este momento. Probá de nuevo en unos minutos.</div>';
+    }
+  }
+
+  document.getElementById('openTrack').addEventListener('click', (e)=>{
+    e.preventDefault();
+    trackOverlay.classList.add('open');
+  });
+  const footerTrackLink = document.getElementById('footerTrackLink');
+  if(footerTrackLink){
+    footerTrackLink.addEventListener('click', (e)=>{
+      e.preventDefault();
+      trackOverlay.classList.add('open');
+    });
+  }
+  document.getElementById('closeTrack').addEventListener('click', ()=> trackOverlay.classList.remove('open'));
+  trackOverlay.addEventListener('click', (e)=>{ if(e.target===trackOverlay) trackOverlay.classList.remove('open'); });
+  document.getElementById('trackBtn').addEventListener('click', trackOrder);
+  trackInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') trackOrder(); });
+
+  // ===== Notificaciones de compras recientes (prueba social) =====
+  const recentProducts = ['Netflix','Spotify','Disney+','ChatGPT Plus','HBO Max','Crunchyroll','Discord Account','NordVPN Account'];
+  const recentNames = ['Fede','Male','Tomi','Nacho','Bren','Vale','Ezequiel','Cami','Santi','Agus'];
+  function showPurchaseToast(){
+    const product = recentProducts[Math.floor(Math.random()*recentProducts.length)];
+    const name = recentNames[Math.floor(Math.random()*recentNames.length)];
+    const mins = Math.floor(Math.random()*12)+1;
+    showToast('<b>'+name+'</b> compró <b>'+product+'</b> hace '+mins+' min');
+  }
+  setTimeout(showPurchaseToast, 8000);
+  setInterval(showPurchaseToast, 35000);
+
+})();
+</script>
+
+</body>
+</html>
