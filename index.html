@@ -682,6 +682,9 @@
   <div class="grid" id="productGrid">
     <p style="grid-column:1/-1;text-align:center;color:var(--text-low);">Cargando catálogo...</p>
   </div>
+  <div style="text-align:center;margin-top:24px;">
+    <button class="btn-secondary" id="showMoreBtn" style="display:none;">Ver más productos</button>
+  </div>
 </section>
 
 <section>
@@ -1281,25 +1284,48 @@ loadReviews();
   const searchInput = document.getElementById('searchInput');
   const filterTabsWrap = document.getElementById('filterTabsWrap');
 
+  const CATALOG_VISIBLE_LIMIT = 8;
+  let catalogExpanded = false;
+  const showMoreBtn = document.getElementById('showMoreBtn');
+
   function filterCatalog(){
     const query = searchInput.value.toLowerCase();
     const activeTabEl = document.querySelector('.filter-tab.active');
     const activeTab = activeTabEl ? activeTabEl.dataset.cat : 'all';
     const allCards = document.querySelectorAll('.card');
+    const isSearching = query.length > 0;
 
+    let visibleCount = 0;
+    let matchCount = 0;
     allCards.forEach(card=>{
       const name = card.dataset.name.toLowerCase();
       const cat = card.dataset.cat;
       const matchesSearch = name.includes(query);
       const matchesCat = activeTab === 'all' || cat === activeTab;
+      const matches = matchesSearch && matchesCat;
 
-      if(matchesSearch && matchesCat){
+      if(!matches){
+        card.style.display = 'none';
+        return;
+      }
+      matchCount++;
+      const withinLimit = isSearching || catalogExpanded || visibleCount < CATALOG_VISIBLE_LIMIT;
+      if(withinLimit){
         card.style.display = 'flex';
+        visibleCount++;
       } else {
         card.style.display = 'none';
       }
     });
+
+    const hasMore = !isSearching && !catalogExpanded && matchCount > CATALOG_VISIBLE_LIMIT;
+    showMoreBtn.style.display = hasMore ? 'inline-flex' : 'none';
   }
+
+  showMoreBtn.addEventListener('click', ()=>{
+    catalogExpanded = true;
+    filterCatalog();
+  });
 
   searchInput.addEventListener('input', filterCatalog);
 
@@ -1327,6 +1353,7 @@ loadReviews();
       t.addEventListener('click', ()=>{
         tabs.forEach(x=>x.classList.remove('active'));
         t.classList.add('active');
+        catalogExpanded = false;
         filterCatalog();
       });
     });
