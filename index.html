@@ -1083,29 +1083,19 @@
 
 <script>
   
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1536719692142616597/Y2vBwsikbtketyzegVcUAE8zBz6zUc6z2IvYKHnjmB4gs8slPUDKb_MX1AjqvcSgtF-D';
+// La notificación a Discord ahora la manda una Supabase Edge Function
+// (supabase/functions/notify-discord). El webhook real ya NO vive acá:
+// queda guardado como secreto en Supabase, invisible desde el navegador.
+const NOTIFY_DISCORD_URL = 'https://ahtotguqbvhsxqbijgxa.supabase.co/functions/v1/notify-discord';
 
 async function sendDiscordOrderNotification(order){
-  if(!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.includes('PEGA_ACA')) return;
-  const itemsText = (order.items || [])
-    .map(i => '• ' + i.qty + 'x ' + i.name + ' — ' + fmt(i.price * i.qty))
-    .join('\n') || 'Sin items';
-  const embed = {
-    title: '🛒 Pedido para revisar — ' + order.code,
-    color: 0x8b5cf6,
-    fields: [
-      { name: 'Cliente', value: order.payer_name || 'Sin especificar', inline: true },
-      { name: 'Total', value: fmt(order.total), inline: true },
-      { name: 'Productos', value: itemsText }
-    ],
-    timestamp: new Date().toISOString()
-  };
   try{
-    await fetch(DISCORD_WEBHOOK_URL, {
+    const res = await fetch(NOTIFY_DISCORD_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: '📥 Nuevo pedido en revisión', embeds: [embed] })
+      body: JSON.stringify(order)
     });
+    if(!res.ok){ console.error('notify-discord respondió con error:', res.status, await res.text()); }
   }catch(err){ console.error('No se pudo notificar a Discord:', err); }
 }
 
