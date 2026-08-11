@@ -341,6 +341,29 @@
   .banner h3{font-family:'Baloo 2';font-size:24px;margin-bottom:8px;}
   .banner p{color:var(--text-mid);font-size:14px;}
 
+  /* Top Compradores */
+  .top-buyers-list{display:flex;flex-direction:column;gap:10px;max-width:640px;margin:0 auto;}
+  .top-buyer-row{
+    display:flex;align-items:center;gap:16px;
+    background:var(--sky-panel);border:1px solid var(--sky-line);
+    border-radius:14px;padding:14px 18px;transition:.2s;
+  }
+  .top-buyer-row:hover{border-color:var(--horizon-orange);}
+  .top-buyer-row.rank-1{border-color:#C9A6FF;background:linear-gradient(90deg,rgba(157,62,223,.14),var(--sky-panel));}
+  .top-buyer-rank{
+    width:36px;height:36px;flex-shrink:0;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Baloo 2';font-weight:700;font-size:15px;
+    background:var(--sky-panel-2);color:var(--text-mid);
+  }
+  .top-buyer-row.rank-1 .top-buyer-rank{background:linear-gradient(135deg,#F5D06F,#C9A6FF);color:#1B1030;}
+  .top-buyer-row.rank-2 .top-buyer-rank{background:linear-gradient(135deg,#C9C9D6,#8F8FA3);color:#1B1030;}
+  .top-buyer-row.rank-3 .top-buyer-rank{background:linear-gradient(135deg,#D9A066,#93511F);color:#1B1030;}
+  .top-buyer-info{flex:1;min-width:0;}
+  .top-buyer-name{font-weight:600;color:var(--text-hi);font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .top-buyer-meta{font-size:12px;color:var(--text-mid);margin-top:2px;}
+  .top-buyer-total{font-family:'Baloo 2';font-weight:700;color:var(--gold);font-size:16px;white-space:nowrap;}
+
   /* Owner */
   .owner-card{
     background:linear-gradient(120deg, rgba(44,62,80,0.08), rgba(26,37,47,0.04));
@@ -696,6 +719,17 @@
   </div>
 </section>
 
+<!-- Top Compradores -->
+<section id="top-compradores">
+  <div class="section-head">
+    <h2 class="section-title">🏆 Top Compradores del Mes</h2>
+    <p class="section-desc">Los clientes que más confiaron en nosotros este mes.</p>
+  </div>
+  <div class="top-buyers-list" id="topBuyersList">
+    <div class="cart-empty">Cargando ranking...</div>
+  </div>
+</section>
+
 <!-- Reseñas -->
 <section id="testimonios">
   <div class="section-head">
@@ -1048,13 +1082,86 @@
 </div>
 
 <script>
-// --- CONEXIÓN SUPABASE ---
+  
+const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1536719692142616597/Y2vBwsikbtketyzegVcUAE8zBz6zUc6z2IvYKHnjmB4gs8slPUDKb_MX1AjqvcSgtF-D';
+
+async function sendDiscordOrderNotification(order){
+  if(!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.includes('PEGA_ACA')) return;
+  const itemsText = (order.items || [])
+    .map(i => '• ' + i.qty + 'x ' + i.name + ' — ' + fmt(i.price * i.qty))
+    .join('\n') || 'Sin items';
+  const embed = {
+    title: '🛒 Pedido para revisar — ' + order.code,
+    color: 0x8b5cf6,
+    fields: [
+      { name: 'Cliente', value: order.payer_name || 'Sin especificar', inline: true },
+      { name: 'Total', value: fmt(order.total), inline: true },
+      { name: 'Productos', value: itemsText }
+    ],
+    timestamp: new Date().toISOString()
+  };
+  try{
+    await fetch(DISCORD_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: '📥 Nuevo pedido en revisión', embeds: [embed] })
+    });
+  }catch(err){ console.error('No se pudo notificar a Discord:', err); }
+}
+
 const SUPABASE_URL = 'https://ahtotguqbvhsxqbijgxa.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_2r5BYlqRe1uJbs_aKp1FCA_DLWEy0cC';
 
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Cargar reseñas desde Supabase
+async function loadTopBuyers(){
+  const listEl = document.getElementById('topBuyersList');
+  if(!listEl) return;
+
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+  const { data, error } = await db.from('orders')
+    .select('user_id, buyer_name, total')
+    .eq('status', 'aprobado')
+    .gte('created_at', firstDay);
+
+  if(error){ console.error('No se pudo cargar el ranking:', error); listEl.innerHTML = '<div class="cart-empty">No se pudo cargar el ranking.</div>'; return; }
+
+  if(!data || data.length === 0){
+    listEl.innerHTML = '<div class="cart-empty">Todavía no hay compras aprobadas este mes.</div>';
+    return;
+  }
+
+  // Agrupar por comprador (user_id, o su nombre si es invitado sin cuenta)
+  const grouped = {};
+  data.forEach(o=>{
+    const key = o.user_id || ('guest:' + (o.buyer_name || 'Invitado'));
+    if(!grouped[key]) grouped[key] = { name: o.buyer_name || 'Cliente', total: 0, orders: 0 };
+    grouped[key].total += Number(o.total) || 0;
+    grouped[key].orders += 1;
+  });
+
+  const ranking = Object.values(grouped)
+    .sort((a,b)=> b.total - a.total)
+    .slice(0, 10);
+
+  const medals = ['🥇','🥈','🥉'];
+  listEl.innerHTML = ranking.map((b, idx)=>{
+    const rankClass = idx < 3 ? ' rank-' + (idx+1) : '';
+    const rankLabel = medals[idx] || ('#' + (idx+1));
+    return '<div class="top-buyer-row' + rankClass + '">'
+      + '<div class="top-buyer-rank">' + rankLabel + '</div>'
+      + '<div class="top-buyer-info">'
+        + '<div class="top-buyer-name">' + b.name + '</div>'
+        + '<div class="top-buyer-meta">' + b.orders + ' pedido' + (b.orders===1?'':'s') + ' este mes</div>'
+      + '</div>'
+      + '<div class="top-buyer-total">' + fmt(b.total) + '</div>'
+    + '</div>';
+  }).join('');
+}
+
 async function loadReviews() {
   const container = document.getElementById('reviewsContainer');
   const { data, error } = await db.from('reviews').select('*').order('id', { ascending: false });
@@ -1102,6 +1209,7 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
 
 // Cargar al iniciar
 loadReviews();
+loadTopBuyers();
 
 // --- LÓGICA DE TIENDA Y CARRITO ---
 (function(){
@@ -1979,7 +2087,8 @@ loadReviews();
           items: cart.map(i=>({ name:i.name, qty:i.qty, price:i.price })),
           total: checkoutTotalRaw(),
           status: 'pendiente',
-          user_id: currentUser ? currentUser.id : null
+          user_id: currentUser ? currentUser.id : null,
+          buyer_name: currentUser ? reviewerLabel(currentUser) : 'Invitado'
         });
       }catch(err){ console.error('No se pudo guardar el pedido en Supabase:', err); }
       document.getElementById('payerNameInput').value = '';
@@ -2008,6 +2117,13 @@ loadReviews();
 
     const { error } = await db.from('orders').update({ payer_name: name, status: 'en_revision' }).eq('code', currentOrderCode);
     if(error){ showToast('No se pudo enviar, probá de nuevo'); console.error(error); return; }
+
+    sendDiscordOrderNotification({
+      code: currentOrderCode,
+      items: cart.map(i=>({ name:i.name, qty:i.qty, price:i.price })),
+      total: checkoutTotalRaw(),
+      payer_name: name
+    });
 
     showCheckoutStep('en_revision');
     subscribeOrderStatus(currentOrderCode);
