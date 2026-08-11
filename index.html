@@ -208,6 +208,14 @@
   }
   .filter-tab.active, .filter-tab:hover{background:var(--sky-panel-2);border-color:var(--horizon-violet);color:var(--text-hi);}
 
+  .admin-tab-btn{
+    padding:7px 14px;border-radius:100px;background:transparent;
+    border:1px solid var(--sky-line);color:var(--text-mid);font-size:12.5px;
+    cursor:pointer;transition:.2s;
+  }
+  .admin-tab-btn.active{background:var(--horizon-orange);border-color:var(--horizon-orange);color:#fff;}
+  .card-icon-text{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
+
   /* Grid & Cards */
   .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
   @media(max-width:920px){.grid{grid-template-columns:repeat(2,1fr);}}
@@ -623,147 +631,7 @@
   </div>
 
   <div class="grid" id="productGrid">
-    <!-- Steam -->
-    <div class="card" data-cat="juegos" data-desc="Cuenta de Steam con acceso completo por 30 a 60 días. Podés cambiar el correo y la clave apenas la recibís." data-name="Steam Account" data-price="30" data-icon-bg="#171a21" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg" data-icon-fill="#fff">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 14 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#171a21;">
-        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg');"></div>
-      </div>
-      <div class="card-name">Steam Account</div>
-      <div class="card-price">$30 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- Rockstar -->
-    <div class="card" data-cat="juegos" data-desc="Cuenta de Rockstar Games lista para usar en servidores de FiveM. No incluye GTA V activado." data-name="Rockstar Account" data-price="250" data-icon-bg="#fcaf17" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg" data-icon-fill="#000">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 6 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#fcaf17;">
-        <div class="logo-mask" style="background:#000;-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg');"></div>
-      </div>
-      <div class="card-name">Rockstar Account</div>
-      <div class="card-price">$250 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- Discord -->
-    <div class="card" data-cat="juegos" data-desc="Cuenta de Discord con acceso completo, incluye el correo asociado. Podés modificarla como quieras." data-name="Discord Account" data-price="250" data-icon-bg="#5865F2" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg" data-icon-fill="#fff">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 22 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#5865F2;">
-        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg');"></div>
-      </div>
-      <div class="card-name">Discord Account</div>
-      <div class="card-price">$250 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- IPVanish -->
-    <div class="card" data-cat="vpn" data-desc="Cuenta premium de IPVanish, lista para usar con los datos que te entregamos." data-name="IPVanish VPN" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg" data-icon-fill="#44B035">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 9 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#000;">
-        <div class="logo-mask" style="background:#44B035;-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg');"></div>
-      </div>
-      <div class="card-name">IPVanish VPN</div>
-      <div class="card-price">$1.000 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- NordVPN -->
-    <div class="card" data-cat="vpn" data-desc="Cuenta premium de NordVPN, acceso inmediato con los datos de inicio de sesión." data-name="NordVPN Account" data-price="2000" data-icon-bg="#4687FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg" data-icon-fill="#fff">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 5 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#4687FF;">
-        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg');"></div>
-      </div>
-      <div class="card-name">NordVPN Account</div>
-      <div class="card-price">$2.000 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- ChatGPT Plus -->
-    <div class="card" data-cat="ia" data-desc="Cuenta de ChatGPT Plus con acceso completo a correo y clave, incluye todos los modelos del plan." data-name="ChatGPT Plus" data-price="6000" data-icon-bg="#10a37f" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg" data-icon-fill="#fff">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 11 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#10a37f;">
-        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg');"></div>
-      </div>
-      <div class="card-name">ChatGPT Plus</div>
-      <div class="card-price">$6.000 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- Disney+ -->
-    <div class="card" data-cat="streaming" data-desc="Cuenta de Disney+ lista para usar, con perfil individual." data-name="Disney+" data-price="1000" data-icon-color="disney" data-icon-content="D+">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 18 disponibles</div>
-      </div>
-      <div class="card-icon disney">D+</div>
-      <div class="card-name">Disney+</div>
-      <div class="card-price">$1.000 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- Netflix -->
-    <div class="card" data-cat="streaming" data-desc="Cuenta de Netflix con acceso vitalicio y perfil propio." data-name="Netflix" data-price="3000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg" data-icon-fill="#E50914">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 27 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#000;">
-        <div class="logo-mask" style="background:#E50914;-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg');"></div>
-      </div>
-      <div class="card-name">Netflix</div>
-      <div class="card-price">$3.000 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- HBO Max -->
-    <div class="card" data-cat="streaming" data-desc="Cuenta de HBO Max lista para usar, con perfil individual." data-name="HBO Max" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg" data-icon-fill="#fff">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 8 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#000;">
-        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg');"></div>
-      </div>
-      <div class="card-name">HBO Max</div>
-      <div class="card-price">$1.000 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- Crunchyroll -->
-    <div class="card" data-cat="anime" data-desc="Cuenta de Crunchyroll para ver anime sin publicidad, con perfil individual." data-name="Crunchyroll" data-price="1250" data-icon-bg="#F47521" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg" data-icon-fill="#fff">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 4 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#F47521;">
-        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg');"></div>
-      </div>
-      <div class="card-name">Crunchyroll</div>
-      <div class="card-price">$1.250 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- Paramount+ -->
-    <div class="card" data-cat="streaming" data-desc="Cuenta de Paramount+ lista para usar, con perfil individual." data-name="Paramount+" data-price="1500" data-icon-bg="#0064FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg" data-icon-fill="#fff">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 12 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#0064FF;">
-        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg');"></div>
-      </div>
-      <div class="card-name">Paramount+</div>
-      <div class="card-price">$1.500 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
-
-    <!-- Spotify -->
-    <div class="card" data-cat="musica" data-desc="Cuenta de Spotify Premium con acceso completo, podés cambiar el correo y la clave." data-name="Spotify" data-price="3500" data-icon-bg="#1DB954" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg" data-icon-fill="#fff">
-      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 16 disponibles</div>
-      </div>
-      <div class="card-icon" style="background:#1DB954;">
-        <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg');"></div>
-      </div>
-      <div class="card-name">Spotify</div>
-      <div class="card-price">$3.500 <span>Ars / cuenta</span></div>
-      <button class="btn-card add-cart-btn">Agregar al carrito</button>
-    </div>
+    <p style="grid-column:1/-1;text-align:center;color:var(--text-low);">Cargando catálogo...</p>
   </div>
 </section>
 
@@ -980,16 +848,16 @@
   </div>
 </div>
 
-<!-- ===== Editor de Categorías Panel (admin) ===== -->
+<!-- ===== Panel de Administración (categorías + productos) ===== -->
 <div id="categoryEditorOverlay" class="overlay">
   <div class="panel">
     <div class="panel-header">
-      <h3>Editor de categorías</h3>
+      <h3>Panel de administración</h3>
       <button class="panel-close" id="closeCategoryEditor">✕</button>
     </div>
     <div class="panel-body">
       <div id="catAuthGate">
-        <p style="color:var(--text-mid);font-size:13.5px;line-height:1.5;margin-bottom:14px;">Iniciá sesión con tu cuenta de administrador para agregar, editar o eliminar categorías del catálogo.</p>
+        <p style="color:var(--text-mid);font-size:13.5px;line-height:1.5;margin-bottom:14px;">Iniciá sesión con tu cuenta de administrador para gestionar categorías y productos.</p>
         <div class="review-form-group">
           <label>Email</label>
           <input type="email" id="catAuthEmail" class="review-form-input" placeholder="admin@tumail.com" autocomplete="username">
@@ -1003,24 +871,89 @@
       </div>
 
       <div id="catManager" style="display:none;">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div class="filter-tabs" style="gap:6px;">
+            <button class="admin-tab-btn active" id="tabBtnCategories" data-tab="tabCategories">Categorías</button>
+            <button class="admin-tab-btn" id="tabBtnProducts" data-tab="tabProducts">Productos</button>
+          </div>
           <button id="catLogoutBtn" style="background:transparent;border:none;color:var(--text-low);font-size:12px;text-decoration:underline;">Cerrar sesión</button>
         </div>
-        <form id="catAddForm" style="margin-bottom:24px;">
-          <div class="review-form-group">
-            <label>Nombre de la categoría</label>
-            <input type="text" id="catNameInput" class="review-form-input" placeholder="Ej: Antivirus" required>
-          </div>
-          <div class="review-form-group">
-            <label>Identificador interno (slug)</label>
-            <input type="text" id="catSlugInput" class="review-form-input" placeholder="Se genera solo si lo dejás vacío">
-            <small style="display:block;color:var(--text-low);font-size:11.5px;margin-top:6px;line-height:1.5;">Usá exactamente este valor en el atributo <code>data-cat</code> de los productos que quieras agrupar en esta categoría.</small>
-          </div>
-          <button type="submit" class="btn-primary btn-full">Agregar categoría</button>
-        </form>
 
-        <div style="font-size:12.5px;color:var(--text-low);margin-bottom:10px;">Tocá el nombre para editarlo. Los cambios se guardan al hacer click afuera.</div>
-        <div id="catList"></div>
+        <!-- Tab: Categorías -->
+        <div id="tabCategories">
+          <form id="catAddForm" style="margin-bottom:24px;">
+            <div class="review-form-group">
+              <label>Nombre de la categoría</label>
+              <input type="text" id="catNameInput" class="review-form-input" placeholder="Ej: Antivirus" required>
+            </div>
+            <div class="review-form-group">
+              <label>Identificador interno (slug)</label>
+              <input type="text" id="catSlugInput" class="review-form-input" placeholder="Se genera solo si lo dejás vacío">
+              <small style="display:block;color:var(--text-low);font-size:11.5px;margin-top:6px;line-height:1.5;">Usá exactamente este valor en el atributo <code>data-cat</code> de los productos que quieras agrupar en esta categoría.</small>
+            </div>
+            <button type="submit" class="btn-primary btn-full">Agregar categoría</button>
+          </form>
+
+          <div style="font-size:12.5px;color:var(--text-low);margin-bottom:10px;">Tocá el nombre para editarlo. Los cambios se guardan al hacer click afuera.</div>
+          <div id="catList"></div>
+        </div>
+
+        <!-- Tab: Productos -->
+        <div id="tabProducts" style="display:none;">
+          <form id="prodAddForm" style="margin-bottom:24px;">
+            <div class="review-form-group">
+              <label>Nombre del producto</label>
+              <input type="text" id="prodNameInput" class="review-form-input" placeholder="Ej: YouTube Premium" required>
+            </div>
+            <div class="review-form-group">
+              <label>Descripción</label>
+              <textarea id="prodDescInput" class="review-form-textarea" rows="2" placeholder="Qué incluye, si es FA o NFA, etc."></textarea>
+            </div>
+            <div style="display:flex;gap:12px;">
+              <div class="review-form-group" style="flex:1;">
+                <label>Precio (Ars)</label>
+                <input type="number" id="prodPriceInput" class="review-form-input" placeholder="1000" min="0" required>
+              </div>
+              <div class="review-form-group" style="flex:1;">
+                <label>Stock</label>
+                <input type="number" id="prodStockInput" class="review-form-input" placeholder="10" min="0" required>
+              </div>
+            </div>
+            <div class="review-form-group">
+              <label>Categoría</label>
+              <select id="prodCategoryInput" class="review-form-select"></select>
+            </div>
+            <div class="review-form-group">
+              <label>Tipo de ícono</label>
+              <select id="prodIconTypeInput" class="review-form-select">
+                <option value="mask">Logo (URL de imagen SVG)</option>
+                <option value="text">Texto / sigla (ej: "D+")</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:12px;">
+              <div class="review-form-group" style="flex:1;">
+                <label>Color de fondo</label>
+                <input type="text" id="prodIconBgInput" class="review-form-input" placeholder="#000000" value="#000000">
+              </div>
+              <div class="review-form-group" style="flex:1;" id="prodIconFillWrap">
+                <label>Color del logo</label>
+                <input type="text" id="prodIconFillInput" class="review-form-input" placeholder="#ffffff" value="#ffffff">
+              </div>
+            </div>
+            <div class="review-form-group" id="prodIconMaskWrap">
+              <label>URL del logo (SVG)</label>
+              <input type="text" id="prodIconMaskInput" class="review-form-input" placeholder="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg">
+            </div>
+            <div class="review-form-group" id="prodIconContentWrap" style="display:none;">
+              <label>Texto a mostrar</label>
+              <input type="text" id="prodIconContentInput" class="review-form-input" placeholder="Ej: D+" maxlength="4">
+            </div>
+            <button type="submit" class="btn-primary btn-full">Agregar producto</button>
+          </form>
+
+          <div style="font-size:12.5px;color:var(--text-low);margin-bottom:10px;">Editá precio y stock directo en la lista — se guardan solos al salir del campo.</div>
+          <div id="prodList"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1115,8 +1048,9 @@ loadReviews();
   function fmt(n){ return '$' + n.toLocaleString('es-AR') + ' Ars'; }
 
   function buildIconHTML(card){
-    if(card.dataset.iconColor === 'disney'){
-      return '<div class="card-icon disney" style="width:100%;height:100%;margin:0;border-radius:0;border:none;">'+card.dataset.iconContent+'</div>';
+    if(card.dataset.iconType === 'text'){
+      const bg = card.dataset.iconBg || '#0d47c7';
+      return '<div class="card-icon-text" style="background:'+bg+';">'+(card.dataset.iconContent||'')+'</div>';
     }
     const bg = card.dataset.iconBg || '#000';
     const mask = card.dataset.iconMask;
@@ -1192,6 +1126,7 @@ loadReviews();
     }
     categories = data || [];
     renderFilterTabs();
+    populateProductCategorySelect();
     if(catUnlocked) renderCatManagerList();
   }
 
@@ -1212,7 +1147,18 @@ loadReviews();
     catManager.style.display = 'block';
     document.getElementById('catAuthError').textContent = '';
     renderCatManagerList();
+    renderProdManagerList();
   }
+
+  // Pestañas Categorías / Productos dentro del panel admin
+  document.querySelectorAll('.admin-tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.admin-tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tabCategories').style.display = btn.dataset.tab === 'tabCategories' ? 'block' : 'none';
+      document.getElementById('tabProducts').style.display = btn.dataset.tab === 'tabProducts' ? 'block' : 'none';
+    });
+  });
 
   function showCatAuthGate(){
     catUnlocked = false;
@@ -1314,6 +1260,172 @@ loadReviews();
   }, true);
 
   loadCategories();
+
+  // --- Productos dinámicos desde Supabase ---
+  let products = [];
+  const productGrid = document.getElementById('productGrid');
+
+  function fmtPrice(n){ return '$' + Number(n).toLocaleString('es-AR'); }
+
+  function buildCardIconInner(p){
+    if(p.icon_type === 'text'){
+      return '<div class="card-icon-text" style="width:100%;height:100%;">'+(p.icon_content||'')+'</div>';
+    }
+    return '<div class="logo-mask" style="background:'+(p.icon_fill||'#fff')+';-webkit-mask-image:url(\''+p.icon_mask+'\');mask-image:url(\''+p.icon_mask+'\');"></div>';
+  }
+
+  function productCardHTML(p){
+    const dataIconAttrs = p.icon_type === 'text'
+      ? 'data-icon-type="text" data-icon-content="'+(p.icon_content||'').replace(/"/g,'&quot;')+'" data-icon-bg="'+(p.icon_bg||'#0d47c7')+'"'
+      : 'data-icon-bg="'+(p.icon_bg||'#000')+'" data-icon-mask="'+(p.icon_mask||'')+'" data-icon-fill="'+(p.icon_fill||'#fff')+'"';
+
+    return '<div class="card" data-cat="'+(p.category_key||'')+'" data-desc="'+(p.description||'').replace(/"/g,'&quot;')+'" data-name="'+p.name.replace(/"/g,'&quot;')+'" data-price="'+Math.round(p.price)+'" '+dataIconAttrs+'>'
+      + '<div class="card-top"><div class="stock-badge"><span class="stock-dot"></span> '+p.stock+' disponibles</div></div>'
+      + '<div class="card-icon" style="background:'+(p.icon_bg||'#000')+';">'+buildCardIconInner(p)+'</div>'
+      + '<div class="card-name">'+p.name+'</div>'
+      + '<div class="card-price">'+fmtPrice(p.price)+' <span>Ars / cuenta</span></div>'
+      + '<button class="btn-card add-cart-btn"'+(p.stock<=0?' disabled style="opacity:.5;cursor:not-allowed;"':'')+'>'+(p.stock<=0?'Sin stock':'Agregar al carrito')+'</button>'
+    + '</div>';
+  }
+
+  function renderProductGrid(){
+    if(products.length === 0){
+      productGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-low);">Todavía no hay productos cargados.</p>';
+      return;
+    }
+    productGrid.innerHTML = products.map(productCardHTML).join('');
+    filterCatalog();
+  }
+
+  async function loadProducts(){
+    const { data, error } = await db.from('products').select('*').order('sort_order', { ascending: true });
+    if(error){
+      console.error('No se pudieron cargar los productos:', error);
+      productGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--text-low);">Error al cargar el catálogo.</p>';
+      return;
+    }
+    products = data || [];
+    renderProductGrid();
+    if(catUnlocked) renderProdManagerList();
+  }
+
+  loadProducts();
+
+  // --- Editor de productos (admin) ---
+  const prodList = document.getElementById('prodList');
+  const prodCategoryInput = document.getElementById('prodCategoryInput');
+  const prodIconTypeInput = document.getElementById('prodIconTypeInput');
+  const prodIconMaskWrap = document.getElementById('prodIconMaskWrap');
+  const prodIconFillWrap = document.getElementById('prodIconFillWrap');
+  const prodIconContentWrap = document.getElementById('prodIconContentWrap');
+
+  function populateProductCategorySelect(){
+    const current = prodCategoryInput.value;
+    prodCategoryInput.innerHTML = '<option value="">Sin categoría</option>'
+      + categories.map(c=>'<option value="'+c.key+'">'+c.label+'</option>').join('');
+    if(current) prodCategoryInput.value = current;
+  }
+
+  prodIconTypeInput.addEventListener('change', ()=>{
+    const isText = prodIconTypeInput.value === 'text';
+    prodIconMaskWrap.style.display = isText ? 'none' : 'block';
+    prodIconFillWrap.style.display = isText ? 'none' : 'block';
+    prodIconContentWrap.style.display = isText ? 'block' : 'none';
+  });
+
+  function renderProdManagerList(){
+    if(products.length === 0){
+      prodList.innerHTML = '<div class="cart-empty">Todavía no cargaste productos.</div>';
+      return;
+    }
+    prodList.innerHTML = products.map(p=>
+      '<div class="cart-item">'
+        + '<div class="cart-item-icon" style="background:'+(p.icon_bg||'#000')+';">'+buildCardIconInner(p)+'</div>'
+        + '<div class="cart-item-info" style="flex:1;">'
+          + '<div class="cart-item-name">'+p.name+'</div>'
+          + '<div style="display:flex;gap:8px;align-items:center;margin-top:6px;">'
+            + '<input type="number" class="review-form-input prod-price-input" data-id="'+p.id+'" value="'+p.price+'" min="0" style="width:90px;padding:7px 10px;font-size:12.5px;" title="Precio">'
+            + '<input type="number" class="review-form-input prod-stock-input" data-id="'+p.id+'" value="'+p.stock+'" min="0" style="width:70px;padding:7px 10px;font-size:12.5px;" title="Stock">'
+          + '</div>'
+        + '</div>'
+        + '<button class="remove-btn" data-act="proddel" data-id="'+p.id+'">✕</button>'
+      + '</div>'
+    ).join('');
+  }
+
+  document.getElementById('prodAddForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const name = document.getElementById('prodNameInput').value.trim();
+    const description = document.getElementById('prodDescInput').value.trim();
+    const price = parseFloat(document.getElementById('prodPriceInput').value);
+    const stock = parseInt(document.getElementById('prodStockInput').value, 10);
+    const category_key = prodCategoryInput.value || null;
+    const icon_type = prodIconTypeInput.value;
+    const icon_bg = document.getElementById('prodIconBgInput').value.trim() || '#000000';
+    const icon_fill = document.getElementById('prodIconFillInput').value.trim() || '#ffffff';
+    const icon_mask = document.getElementById('prodIconMaskInput').value.trim() || null;
+    const icon_content = document.getElementById('prodIconContentInput').value.trim() || null;
+
+    if(!name || isNaN(price) || isNaN(stock)) return;
+
+    const { error } = await db.from('products').insert([{
+      name, description, price, stock, category_key,
+      icon_type, icon_bg, icon_fill, icon_mask, icon_content,
+      sort_order: products.length
+    }]);
+
+    if(error){
+      showToast('No se pudo crear el producto');
+      console.error(error);
+      return;
+    }
+    showToast('Producto creado');
+    document.getElementById('prodAddForm').reset();
+    prodIconMaskWrap.style.display = 'block';
+    prodIconFillWrap.style.display = 'block';
+    prodIconContentWrap.style.display = 'none';
+    await loadProducts();
+  });
+
+  prodList.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-act="proddel"]');
+    if(!btn) return;
+    const id = btn.dataset.id;
+    const p = products.find(x => String(x.id) === String(id));
+    if(!p) return;
+    if(!confirm('¿Eliminar el producto "'+p.name+'"?')) return;
+
+    const { error } = await db.from('products').delete().eq('id', id);
+    if(error){ showToast('Error al eliminar el producto'); console.error(error); return; }
+    showToast('Producto eliminado');
+    await loadProducts();
+  });
+
+  prodList.addEventListener('change', async (e)=>{
+    const priceEl = e.target.closest('.prod-price-input');
+    const stockEl = e.target.closest('.prod-stock-input');
+    const el = priceEl || stockEl;
+    if(!el) return;
+
+    const id = el.dataset.id;
+    const p = products.find(x => String(x.id) === String(id));
+    if(!p) return;
+
+    const field = priceEl ? 'price' : 'stock';
+    const value = priceEl ? parseFloat(el.value) : parseInt(el.value, 10);
+    if(isNaN(value) || value < 0){ el.value = p[field]; return; }
+
+    const { error } = await db.from('products').update({ [field]: value }).eq('id', id);
+    if(error){
+      showToast('No se pudo actualizar');
+      console.error(error);
+      el.value = p[field];
+      return;
+    }
+    p[field] = value;
+    showToast(field === 'price' ? 'Precio actualizado' : 'Stock actualizado');
+    renderProductGrid();
+  });
 
   function addProductToCart(card){
     const name = card.dataset.name;
