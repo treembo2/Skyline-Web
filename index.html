@@ -485,20 +485,6 @@
   .coupon-msg.ok{color:var(--success);}
   .coupon-msg.err{color:#F26A6A;}
 
-  /* Rastreo de pedido */
-  .track-form{display:flex;gap:8px;margin-bottom:20px;}
-  .track-input{
-    flex:1;padding:12px 14px;border-radius:9px;
-    background:var(--sky-panel-2);border:1px solid var(--sky-line);
-    color:var(--text-hi);font-size:13px;outline:none;text-transform:uppercase;
-  }
-  .track-input:focus{border-color:var(--horizon-violet);}
-  .track-result{display:none;}
-  .track-result.show{display:block;}
-  .track-empty{color:var(--text-low);font-size:13px;text-align:center;padding:20px 0;}
-  .track-order-code{font-family:'JetBrains Mono';color:var(--gold);font-size:15px;margin-bottom:4px;}
-  .track-order-items{color:var(--text-mid);font-size:13px;margin-bottom:20px;line-height:1.6;}
-
   /* Detalle de producto */
   .pd-top{display:flex;gap:16px;align-items:center;margin-bottom:20px;}
   .pd-icon{
@@ -568,7 +554,6 @@
     <a href="#tienda">Tienda</a>
     <a href="#testimonios">Reseñas</a>
     <a href="#faq">Preguntas</a>
-    <a href="#" id="openTrack">Rastrear pedido</a>
   </nav>
   <div class="nav-right">
     <button id="openCart" class="btn-ghost cart-btn">🛒 Carrito <span id="cartCount" class="cart-count">0</span></button>
@@ -880,7 +865,6 @@
       <h5>Tienda</h5>
       <a href="#tienda">Catálogo</a>
       <a href="#como-funciona">Cómo funciona</a>
-      <a href="#" id="footerTrackLink">Rastrear pedido</a>
     </div>
     <div class="footer-col">
       <h5>Ayuda</h5>
@@ -965,57 +949,6 @@
         <a id="btnDiscordTicket" href="https://discord.gg/B3wp4Ygv8J" target="_blank" class="btn-primary btn-full">
           💬 Copiar Resumen y Abrir Discord
         </a>
-      </div>
-
-      <div class="order-status">
-        <div class="order-status-label">Estado de tu pedido</div>
-
-        <div class="order-code-row">
-          <div>
-            <div class="order-code-label">Código de pedido</div>
-            <div class="order-code-val" id="orderCode">—</div>
-          </div>
-          <button class="copy-btn" id="copyOrderCode">Copiar</button>
-        </div>
-
-        <div class="stepper">
-          <div class="step-item active pulse">
-            <div class="step-connector"></div>
-            <div class="step-dot">1</div>
-            <div class="step-label">Transferencia enviada</div>
-          </div>
-          <div class="step-item">
-            <div class="step-connector"></div>
-            <div class="step-dot">2</div>
-            <div class="step-label">Comprobante recibido</div>
-          </div>
-          <div class="step-item">
-            <div class="step-connector"></div>
-            <div class="step-dot">3</div>
-            <div class="step-label">Confirmado por staff</div>
-          </div>
-        </div>
-
-        <p class="status-note">La confirmación final la realiza un miembro del equipo en tu ticket de Discord tras verificar el pago.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== Rastrear Pedido Panel ===== -->
-<div id="trackOverlay" class="overlay">
-  <div class="panel">
-    <div class="panel-header">
-      <h3>Rastrear pedido</h3>
-      <button class="panel-close" id="closeTrack">✕</button>
-    </div>
-    <div class="panel-body">
-      <div class="track-form">
-        <input type="text" id="trackInput" class="track-input" placeholder="Ej: SKY-4F82A1">
-        <button class="btn-primary" id="trackBtn" type="button">Buscar</button>
-      </div>
-      <div id="trackResult">
-        <div class="track-empty">Ingresá tu código de pedido para ver el estado.</div>
       </div>
     </div>
   </div>
@@ -1301,8 +1234,6 @@ loadReviews();
 
     if(!currentOrderCode){
       currentOrderCode = genOrderCode();
-      document.getElementById('orderCode').textContent = currentOrderCode;
-      document.getElementById('copyOrderCode').dataset.copy = currentOrderCode;
     }
 
     // Guarda el pedido en Supabase para poder rastrearlo (requiere tabla "orders")
@@ -1389,65 +1320,6 @@ loadReviews();
       setTimeout(()=>{ btn.textContent = old; }, 1500);
     });
   });
-
-  // ===== Rastrear pedido =====
-  const trackOverlay = document.getElementById('trackOverlay');
-  const trackResultEl = document.getElementById('trackResult');
-  const trackInput = document.getElementById('trackInput');
-
-  const STATUS_STEP = { 'pendiente':1, 'comprobante_recibido':2, 'confirmado':3 };
-  const STATUS_LABEL = { 'pendiente':'Esperando comprobante', 'comprobante_recibido':'Comprobante recibido, en revisión', 'confirmado':'Confirmado y entregado' };
-
-  function renderTrackResult(order){
-    if(!order){
-      trackResultEl.innerHTML = '<div class="track-empty">No encontramos ningún pedido con ese código. Revisá que esté bien escrito.</div>';
-      return;
-    }
-    const step = STATUS_STEP[order.status] || 1;
-    const itemsText = (order.items || []).map(i => `${i.qty}x ${i.name}`).join(', ');
-    let stepsHTML = '';
-    ['Transferencia enviada','Comprobante recibido','Confirmado por staff'].forEach((label, idx)=>{
-      const n = idx+1;
-      const cls = n < step ? 'done' : (n === step ? 'active pulse' : '');
-      stepsHTML += '<div class="step-item '+cls+'"><div class="step-connector"></div><div class="step-dot">'+n+'</div><div class="step-label">'+label+'</div></div>';
-    });
-
-    trackResultEl.innerHTML =
-      '<div class="track-order-code">'+order.code+'</div>'
-      + '<div class="track-order-items">'+itemsText+' — Total: '+fmt(order.total)+'</div>'
-      + '<div class="stepper">'+stepsHTML+'</div>'
-      + '<p class="status-note"><b>Estado:</b> '+(STATUS_LABEL[order.status] || order.status)+'</p>';
-  }
-
-  async function trackOrder(){
-    const code = trackInput.value.trim().toUpperCase();
-    if(!code){ return; }
-    trackResultEl.innerHTML = '<div class="track-empty">Buscando pedido...</div>';
-    try{
-      const { data, error } = await db.from('orders').select('*').eq('code', code).maybeSingle();
-      if(error) throw error;
-      renderTrackResult(data);
-    }catch(err){
-      console.error(err);
-      trackResultEl.innerHTML = '<div class="track-empty">No pudimos consultar el pedido en este momento. Probá de nuevo en unos minutos.</div>';
-    }
-  }
-
-  document.getElementById('openTrack').addEventListener('click', (e)=>{
-    e.preventDefault();
-    trackOverlay.classList.add('open');
-  });
-  const footerTrackLink = document.getElementById('footerTrackLink');
-  if(footerTrackLink){
-    footerTrackLink.addEventListener('click', (e)=>{
-      e.preventDefault();
-      trackOverlay.classList.add('open');
-    });
-  }
-  document.getElementById('closeTrack').addEventListener('click', ()=> trackOverlay.classList.remove('open'));
-  trackOverlay.addEventListener('click', (e)=>{ if(e.target===trackOverlay) trackOverlay.classList.remove('open'); });
-  document.getElementById('trackBtn').addEventListener('click', trackOrder);
-  trackInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') trackOrder(); });
 
   // ===== Notificaciones de compras recientes (prueba social) =====
   const recentProducts = ['Netflix','Spotify','Disney+','ChatGPT Plus','HBO Max','Crunchyroll','Discord Account','NordVPN Account'];
