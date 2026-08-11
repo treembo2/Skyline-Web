@@ -1003,7 +1003,8 @@
             <div class="review-form-group">
               <label>Tipo de ícono</label>
               <select id="prodIconTypeInput" class="review-form-select">
-                <option value="mask">Logo (URL de imagen SVG)</option>
+                <option value="mask">Logo (SVG de simple-icons, se colorea)</option>
+                <option value="image">Imagen (PNG, JPG o cualquier link de imagen)</option>
                 <option value="text">Texto / sigla (ej: "D+")</option>
               </select>
             </div>
@@ -1018,7 +1019,7 @@
               </div>
             </div>
             <div class="review-form-group" id="prodIconMaskWrap">
-              <label>URL del logo (SVG)</label>
+              <label id="prodIconMaskLabel">URL del logo (SVG)</label>
               <input type="text" id="prodIconMaskInput" class="review-form-input" placeholder="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg">
             </div>
             <div class="review-form-group" id="prodIconContentWrap" style="display:none;">
@@ -1261,6 +1262,13 @@ loadReviews();
       const bg = card.dataset.iconBg || '#0d47c7';
       return '<div class="card-icon-text" style="background:'+bg+';">'+(card.dataset.iconContent||'')+'</div>';
     }
+    if(card.dataset.iconType === 'image'){
+      const bg = card.dataset.iconBg || '#000';
+      const src = card.dataset.iconMask || '';
+      return '<div style="width:100%;height:100%;background:'+bg+';display:flex;align-items:center;justify-content:center;overflow:hidden;">'
+        + '<img src="'+src+'" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">'
+        + '</div>';
+    }
     const bg = card.dataset.iconBg || '#000';
     const mask = card.dataset.iconMask;
     const fill = card.dataset.iconFill || '#fff';
@@ -1449,13 +1457,18 @@ loadReviews();
     if(p.icon_type === 'text'){
       return '<div class="card-icon-text" style="width:100%;height:100%;">'+(p.icon_content||'')+'</div>';
     }
+    if(p.icon_type === 'image'){
+      return '<img src="'+(p.icon_mask||'')+'" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">';
+    }
     return '<div class="logo-mask" style="background:'+(p.icon_fill||'#fff')+';-webkit-mask-image:url(\''+p.icon_mask+'\');mask-image:url(\''+p.icon_mask+'\');"></div>';
   }
 
   function productCardHTML(p){
     const dataIconAttrs = p.icon_type === 'text'
       ? 'data-icon-type="text" data-icon-content="'+(p.icon_content||'').replace(/"/g,'&quot;')+'" data-icon-bg="'+(p.icon_bg||'#0d47c7')+'"'
-      : 'data-icon-bg="'+(p.icon_bg||'#000')+'" data-icon-mask="'+(p.icon_mask||'')+'" data-icon-fill="'+(p.icon_fill||'#fff')+'"';
+      : p.icon_type === 'image'
+        ? 'data-icon-type="image" data-icon-bg="'+(p.icon_bg||'#000')+'" data-icon-mask="'+(p.icon_mask||'')+'"'
+        : 'data-icon-bg="'+(p.icon_bg||'#000')+'" data-icon-mask="'+(p.icon_mask||'')+'" data-icon-fill="'+(p.icon_fill||'#fff')+'"';
 
     return '<div class="card" data-cat="'+(p.category_key||'')+'" data-desc="'+(p.description||'').replace(/"/g,'&quot;')+'" data-name="'+p.name.replace(/"/g,'&quot;')+'" data-price="'+Math.round(p.price)+'" '+dataIconAttrs+'>'
       + '<div class="card-top"><div class="stock-badge"><span class="stock-dot"></span> '+p.stock+' disponibles</div></div>'
@@ -1504,9 +1517,7 @@ loadReviews();
   function exitProductEditMode(){
     editingProductId = null;
     document.getElementById('prodAddForm').reset();
-    prodIconMaskWrap.style.display = 'block';
-    prodIconFillWrap.style.display = 'block';
-    prodIconContentWrap.style.display = 'none';
+    syncProdIconFields();
     document.getElementById('prodIconBgInput').value = '#000000';
     document.getElementById('prodIconFillInput').value = '#ffffff';
     prodFormSubmitBtn.textContent = 'Agregar producto';
@@ -1525,10 +1536,7 @@ loadReviews();
     document.getElementById('prodIconFillInput').value = p.icon_fill || '#ffffff';
     document.getElementById('prodIconMaskInput').value = p.icon_mask || '';
     document.getElementById('prodIconContentInput').value = p.icon_content || '';
-    const isText = prodIconTypeInput.value === 'text';
-    prodIconMaskWrap.style.display = isText ? 'none' : 'block';
-    prodIconFillWrap.style.display = isText ? 'none' : 'block';
-    prodIconContentWrap.style.display = isText ? 'block' : 'none';
+    syncProdIconFields();
     prodFormSubmitBtn.textContent = 'Guardar cambios';
     prodFormCancelBtn.style.display = 'block';
     document.getElementById('prodAddForm').scrollIntoView({ behavior:'smooth', block:'start' });
@@ -1543,12 +1551,17 @@ loadReviews();
     if(current) prodCategoryInput.value = current;
   }
 
-  prodIconTypeInput.addEventListener('change', ()=>{
-    const isText = prodIconTypeInput.value === 'text';
+  function syncProdIconFields(){
+    const val = prodIconTypeInput.value;
+    const isText = val === 'text';
+    const isImage = val === 'image';
     prodIconMaskWrap.style.display = isText ? 'none' : 'block';
-    prodIconFillWrap.style.display = isText ? 'none' : 'block';
+    prodIconFillWrap.style.display = (isText || isImage) ? 'none' : 'block';
     prodIconContentWrap.style.display = isText ? 'block' : 'none';
-  });
+    document.getElementById('prodIconMaskLabel').textContent = isImage ? 'URL de la imagen (PNG, JPG o SVG)' : 'URL del logo (SVG)';
+  }
+
+  prodIconTypeInput.addEventListener('change', syncProdIconFields);
 
   function renderProdManagerList(){
     if(products.length === 0){
