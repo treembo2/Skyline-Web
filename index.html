@@ -1088,11 +1088,17 @@
 // queda guardado como secreto en Supabase, invisible desde el navegador.
 const NOTIFY_DISCORD_URL = 'https://ahtotguqbvhsxqbijgxa.supabase.co/functions/v1/notify-discord';
 
+function fmt(n){ return '$' + n.toLocaleString('es-AR') + ' Ars'; }
+
 async function sendDiscordOrderNotification(order){
   try{
     const res = await fetch(NOTIFY_DISCORD_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'apikey': SUPABASE_KEY
+      },
       body: JSON.stringify(order)
     });
     if(!res.ok){ console.error('notify-discord respondió con error:', res.status, await res.text()); }
@@ -1355,8 +1361,6 @@ loadTopBuyers();
   const checkoutSummaryEl = document.getElementById('checkoutSummary');
   const copyAmountBtn = document.getElementById('copyAmountBtn');
   const btnDiscordTicket = document.getElementById('btnDiscordTicket');
-
-  function fmt(n){ return '$' + n.toLocaleString('es-AR') + ' Ars'; }
 
   function buildIconHTML(card){
     if(card.dataset.iconType === 'text'){
