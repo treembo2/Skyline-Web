@@ -345,6 +345,7 @@
   .footer-brand-mark{display:flex;align-items:center;gap:10px;font-family:'Baloo 2';font-weight:700;font-size:15px;color:var(--text-hi);margin-bottom:12px;}
   .footer-brand-img{width:26px;height:26px;border-radius:7px;object-fit:cover;}
   .footer-desc{font-size:13px;line-height:1.6;max-width:280px;margin-bottom:16px;}
+  #openCategoryEditor:hover{opacity:1 !important;color:var(--text-hi);}
   .footer-socials{display:flex;gap:10px;}
   .footer-social-btn{
     width:34px;height:34px;border-radius:9px;border:1px solid var(--sky-line);
@@ -616,14 +617,8 @@
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" class="search-input" placeholder="Buscar servicio...">
     </div>
-    <div class="filter-tabs">
+    <div class="filter-tabs" id="filterTabsWrap">
       <button class="filter-tab active" data-cat="all">Todos</button>
-      <button class="filter-tab" data-cat="streaming">Streaming</button>
-      <button class="filter-tab" data-cat="juegos">Juegos</button>
-      <button class="filter-tab" data-cat="vpn">VPN</button>
-      <button class="filter-tab" data-cat="ia">IA</button>
-      <button class="filter-tab" data-cat="musica">Música</button>
-      <button class="filter-tab" data-cat="anime">Anime</button>
     </div>
   </div>
 
@@ -880,7 +875,10 @@
   </div>
   <div class="footer-bottom">
     <div>© 2026 Skyline Store</div>
-    <div>Atendido directamente por el equipo, sin intermediarios 🇦🇷</div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <span>Atendido directamente por el equipo, sin intermediarios 🇦🇷</span>
+      <button id="openCategoryEditor" title="Administrar categorías" style="background:transparent;border:none;color:var(--text-low);font-size:14px;opacity:.6;transition:.2s;">⚙️</button>
+    </div>
   </div>
 </footer>
 
@@ -978,6 +976,52 @@
     </div>
     <div class="panel-footer">
       <button class="btn-primary" id="pdAddBtn" style="width:100%;">Agregar al carrito</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Editor de Categorías Panel (admin) ===== -->
+<div id="categoryEditorOverlay" class="overlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h3>Editor de categorías</h3>
+      <button class="panel-close" id="closeCategoryEditor">✕</button>
+    </div>
+    <div class="panel-body">
+      <div id="catAuthGate">
+        <p style="color:var(--text-mid);font-size:13.5px;line-height:1.5;margin-bottom:14px;">Iniciá sesión con tu cuenta de administrador para agregar, editar o eliminar categorías del catálogo.</p>
+        <div class="review-form-group">
+          <label>Email</label>
+          <input type="email" id="catAuthEmail" class="review-form-input" placeholder="admin@tumail.com" autocomplete="username">
+        </div>
+        <div class="review-form-group">
+          <label>Contraseña</label>
+          <input type="password" id="catAuthPassword" class="review-form-input" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button class="btn-primary btn-full" id="catAuthBtn">Iniciar sesión</button>
+        <div id="catAuthError" style="color:#F87171;font-size:12.5px;margin-top:10px;"></div>
+      </div>
+
+      <div id="catManager" style="display:none;">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+          <button id="catLogoutBtn" style="background:transparent;border:none;color:var(--text-low);font-size:12px;text-decoration:underline;">Cerrar sesión</button>
+        </div>
+        <form id="catAddForm" style="margin-bottom:24px;">
+          <div class="review-form-group">
+            <label>Nombre de la categoría</label>
+            <input type="text" id="catNameInput" class="review-form-input" placeholder="Ej: Antivirus" required>
+          </div>
+          <div class="review-form-group">
+            <label>Identificador interno (slug)</label>
+            <input type="text" id="catSlugInput" class="review-form-input" placeholder="Se genera solo si lo dejás vacío">
+            <small style="display:block;color:var(--text-low);font-size:11.5px;margin-top:6px;line-height:1.5;">Usá exactamente este valor en el atributo <code>data-cat</code> de los productos que quieras agrupar en esta categoría.</small>
+          </div>
+          <button type="submit" class="btn-primary btn-full">Agregar categoría</button>
+        </form>
+
+        <div style="font-size:12.5px;color:var(--text-low);margin-bottom:10px;">Tocá el nombre para editarlo. Los cambios se guardan al hacer click afuera.</div>
+        <div id="catList"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1084,11 +1128,12 @@ loadReviews();
 
   // Búsqueda y Filtros
   const searchInput = document.getElementById('searchInput');
-  const filterTabs = document.querySelectorAll('.filter-tab');
+  const filterTabsWrap = document.getElementById('filterTabsWrap');
 
   function filterCatalog(){
     const query = searchInput.value.toLowerCase();
-    const activeTab = document.querySelector('.filter-tab.active').dataset.cat;
+    const activeTabEl = document.querySelector('.filter-tab.active');
+    const activeTab = activeTabEl ? activeTabEl.dataset.cat : 'all';
     const allCards = document.querySelectorAll('.card');
 
     allCards.forEach(card=>{
@@ -1106,13 +1151,169 @@ loadReviews();
   }
 
   searchInput.addEventListener('input', filterCatalog);
-  filterTabs.forEach(tab=>{
-    tab.addEventListener('click', ()=>{
-      filterTabs.forEach(t=>t.classList.remove('active'));
-      tab.classList.add('active');
-      filterCatalog();
+
+  // --- Categorías dinámicas desde Supabase ---
+  let categories = [];
+
+  function slugify(str){
+    return str.toString().toLowerCase().trim()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-z0-9]+/g,'-')
+      .replace(/(^-+|-+$)/g,'');
+  }
+
+  function renderFilterTabs(){
+    const prevActiveEl = document.querySelector('.filter-tab.active');
+    const prevCat = prevActiveEl ? prevActiveEl.dataset.cat : 'all';
+
+    filterTabsWrap.innerHTML = '<button class="filter-tab" data-cat="all">Todos</button>'
+      + categories.map(c=>'<button class="filter-tab" data-cat="'+c.key+'">'+c.label+'</button>').join('');
+
+    const tabs = filterTabsWrap.querySelectorAll('.filter-tab');
+    const stillExists = Array.from(tabs).some(t=>t.dataset.cat === prevCat);
+    tabs.forEach(t=>{
+      if(t.dataset.cat === (stillExists ? prevCat : 'all')) t.classList.add('active');
+      t.addEventListener('click', ()=>{
+        tabs.forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        filterCatalog();
+      });
     });
+    filterCatalog();
+  }
+
+  async function loadCategories(){
+    const { data, error } = await db.from('categories').select('*').order('label', { ascending: true });
+    if(error){
+      console.error('No se pudieron cargar las categorías:', error);
+      filterTabsWrap.innerHTML = '<button class="filter-tab active" data-cat="all">Todos</button>';
+      filterCatalog();
+      return;
+    }
+    categories = data || [];
+    renderFilterTabs();
+    if(catUnlocked) renderCatManagerList();
+  }
+
+  // --- Editor de categorías (admin, con Supabase Auth real) ---
+  let catUnlocked = false;
+  const categoryEditorOverlay = document.getElementById('categoryEditorOverlay');
+  const catAuthGate = document.getElementById('catAuthGate');
+  const catManager = document.getElementById('catManager');
+  const catList = document.getElementById('catList');
+
+  document.getElementById('openCategoryEditor').addEventListener('click', ()=> categoryEditorOverlay.classList.add('open'));
+  document.getElementById('closeCategoryEditor').addEventListener('click', ()=> categoryEditorOverlay.classList.remove('open'));
+  categoryEditorOverlay.addEventListener('click', (e)=>{ if(e.target===categoryEditorOverlay) categoryEditorOverlay.classList.remove('open'); });
+
+  function showCatManager(){
+    catUnlocked = true;
+    catAuthGate.style.display = 'none';
+    catManager.style.display = 'block';
+    document.getElementById('catAuthError').textContent = '';
+    renderCatManagerList();
+  }
+
+  function showCatAuthGate(){
+    catUnlocked = false;
+    catManager.style.display = 'none';
+    catAuthGate.style.display = 'block';
+    document.getElementById('catAuthEmail').value = '';
+    document.getElementById('catAuthPassword').value = '';
+  }
+
+  // Si ya había una sesión activa (login previo guardado por Supabase), entra directo
+  db.auth.getSession().then(({ data })=>{
+    if(data && data.session) showCatManager();
   });
+
+  document.getElementById('catAuthBtn').addEventListener('click', async ()=>{
+    const email = document.getElementById('catAuthEmail').value.trim();
+    const password = document.getElementById('catAuthPassword').value;
+    const errEl = document.getElementById('catAuthError');
+    errEl.textContent = '';
+
+    if(!email || !password){ errEl.textContent = 'Completá email y contraseña.'; return; }
+
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    if(error){
+      errEl.textContent = 'Email o contraseña incorrectos.';
+      console.error(error);
+      return;
+    }
+    showCatManager();
+  });
+
+  document.getElementById('catLogoutBtn').addEventListener('click', async ()=>{
+    await db.auth.signOut();
+    showCatAuthGate();
+  });
+
+  function renderCatManagerList(){
+    if(categories.length === 0){
+      catList.innerHTML = '<div class="cart-empty">Todavía no creaste categorías.</div>';
+      return;
+    }
+    catList.innerHTML = categories.map(c=>
+      '<div class="cart-item">'
+        + '<div class="cart-item-info" style="flex:1;">'
+          + '<div class="cart-item-name" contenteditable="true" spellcheck="false" data-field="label" data-id="'+c.id+'">'+c.label+'</div>'
+          + '<div class="cart-item-price">key: '+c.key+'</div>'
+        + '</div>'
+        + '<button class="remove-btn" data-act="catdel" data-id="'+c.id+'">✕</button>'
+      + '</div>'
+    ).join('');
+  }
+
+  document.getElementById('catAddForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const label = document.getElementById('catNameInput').value.trim();
+    const rawKey = document.getElementById('catSlugInput').value.trim();
+    const key = slugify(rawKey || label);
+    if(!label || !key) return;
+
+    const { error } = await db.from('categories').insert([{ label, key }]);
+    if(error){
+      showToast('No se pudo crear la categoría (¿el identificador ya existe o falta iniciar sesión?)');
+      console.error(error);
+      return;
+    }
+    showToast('Categoría creada');
+    document.getElementById('catAddForm').reset();
+    await loadCategories();
+  });
+
+  catList.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-act="catdel"]');
+    if(!btn) return;
+    const id = btn.dataset.id;
+    const cat = categories.find(c => String(c.id) === String(id));
+    if(!cat) return;
+    if(!confirm('¿Eliminar la categoría "'+cat.label+'"? Los productos con data-cat="'+cat.key+'" van a dejar de tener un filtro propio (van a seguir viéndose en "Todos").')) return;
+
+    const { error } = await db.from('categories').delete().eq('id', id);
+    if(error){ showToast('Error al eliminar la categoría'); console.error(error); return; }
+    showToast('Categoría eliminada');
+    await loadCategories();
+  });
+
+  catList.addEventListener('blur', async (e)=>{
+    const el = e.target.closest('[data-field="label"]');
+    if(!el) return;
+    const id = el.dataset.id;
+    const cat = categories.find(c => String(c.id) === String(id));
+    if(!cat) return;
+    const newLabel = el.textContent.trim();
+    if(!newLabel || newLabel === cat.label){ el.textContent = cat.label; return; }
+
+    const { error } = await db.from('categories').update({ label: newLabel }).eq('id', id);
+    if(error){ showToast('Error al renombrar (¿falta una policy de UPDATE en la tabla?)'); console.error(error); el.textContent = cat.label; return; }
+    showToast('Categoría actualizada');
+    cat.label = newLabel;
+    renderFilterTabs();
+  }, true);
+
+  loadCategories();
 
   function addProductToCart(card){
     const name = card.dataset.name;
