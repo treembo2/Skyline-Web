@@ -1025,10 +1025,11 @@
               <label>Texto a mostrar</label>
               <input type="text" id="prodIconContentInput" class="review-form-input" placeholder="Ej: D+" maxlength="4">
             </div>
-            <button type="submit" class="btn-primary btn-full">Agregar producto</button>
+            <button type="submit" class="btn-primary btn-full" id="prodFormSubmitBtn">Agregar producto</button>
+            <button type="button" class="btn-ghost btn-full" id="prodFormCancelBtn" style="display:none;margin-top:8px;">Cancelar edición</button>
           </form>
 
-          <div style="font-size:12.5px;color:var(--text-low);margin-bottom:10px;">Editá precio y stock directo en la lista — se guardan solos al salir del campo.</div>
+          <div style="font-size:12.5px;color:var(--text-low);margin-bottom:10px;">Editá precio y stock directo en la lista, o tocá "Editar" para cambiar nombre, descripción, categoría o ícono.</div>
           <div id="prodList"></div>
         </div>
 
@@ -1496,6 +1497,45 @@ loadReviews();
   const prodIconFillWrap = document.getElementById('prodIconFillWrap');
   const prodIconContentWrap = document.getElementById('prodIconContentWrap');
 
+  let editingProductId = null;
+  const prodFormSubmitBtn = document.getElementById('prodFormSubmitBtn');
+  const prodFormCancelBtn = document.getElementById('prodFormCancelBtn');
+
+  function exitProductEditMode(){
+    editingProductId = null;
+    document.getElementById('prodAddForm').reset();
+    prodIconMaskWrap.style.display = 'block';
+    prodIconFillWrap.style.display = 'block';
+    prodIconContentWrap.style.display = 'none';
+    document.getElementById('prodIconBgInput').value = '#000000';
+    document.getElementById('prodIconFillInput').value = '#ffffff';
+    prodFormSubmitBtn.textContent = 'Agregar producto';
+    prodFormCancelBtn.style.display = 'none';
+  }
+
+  function enterProductEditMode(p){
+    editingProductId = p.id;
+    document.getElementById('prodNameInput').value = p.name || '';
+    document.getElementById('prodDescInput').value = p.description || '';
+    document.getElementById('prodPriceInput').value = p.price;
+    document.getElementById('prodStockInput').value = p.stock;
+    prodCategoryInput.value = p.category_key || '';
+    prodIconTypeInput.value = p.icon_type || 'mask';
+    document.getElementById('prodIconBgInput').value = p.icon_bg || '#000000';
+    document.getElementById('prodIconFillInput').value = p.icon_fill || '#ffffff';
+    document.getElementById('prodIconMaskInput').value = p.icon_mask || '';
+    document.getElementById('prodIconContentInput').value = p.icon_content || '';
+    const isText = prodIconTypeInput.value === 'text';
+    prodIconMaskWrap.style.display = isText ? 'none' : 'block';
+    prodIconFillWrap.style.display = isText ? 'none' : 'block';
+    prodIconContentWrap.style.display = isText ? 'block' : 'none';
+    prodFormSubmitBtn.textContent = 'Guardar cambios';
+    prodFormCancelBtn.style.display = 'block';
+    document.getElementById('prodAddForm').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  prodFormCancelBtn.addEventListener('click', exitProductEditMode);
+
   function populateProductCategorySelect(){
     const current = prodCategoryInput.value;
     prodCategoryInput.innerHTML = '<option value="">Sin categoría</option>'
@@ -1525,7 +1565,10 @@ loadReviews();
             + '<input type="number" class="review-form-input prod-stock-input" data-id="'+p.id+'" value="'+p.stock+'" min="0" style="width:70px;padding:7px 10px;font-size:12.5px;" title="Stock">'
           + '</div>'
         + '</div>'
-        + '<button class="remove-btn" data-act="proddel" data-id="'+p.id+'">✕</button>'
+        + '<div style="display:flex;flex-direction:column;gap:6px;">'
+          + '<button class="btn-ghost" data-act="prodedit" data-id="'+p.id+'" style="padding:6px 12px;font-size:12px;">Editar</button>'
+          + '<button class="remove-btn" data-act="proddel" data-id="'+p.id+'">✕</button>'
+        + '</div>'
       + '</div>'
     ).join('');
   }
@@ -1545,6 +1588,23 @@ loadReviews();
 
     if(!name || isNaN(price) || isNaN(stock)) return;
 
+    if(editingProductId){
+      const { error } = await db.from('products').update({
+        name, description, price, stock, category_key,
+        icon_type, icon_bg, icon_fill, icon_mask, icon_content
+      }).eq('id', editingProductId);
+
+      if(error){
+        showToast('No se pudo guardar los cambios');
+        console.error(error);
+        return;
+      }
+      showToast('Producto actualizado');
+      exitProductEditMode();
+      await loadProducts();
+      return;
+    }
+
     const { error } = await db.from('products').insert([{
       name, description, price, stock, category_key,
       icon_type, icon_bg, icon_fill, icon_mask, icon_content,
@@ -1557,14 +1617,17 @@ loadReviews();
       return;
     }
     showToast('Producto creado');
-    document.getElementById('prodAddForm').reset();
-    prodIconMaskWrap.style.display = 'block';
-    prodIconFillWrap.style.display = 'block';
-    prodIconContentWrap.style.display = 'none';
+    exitProductEditMode();
     await loadProducts();
   });
 
   prodList.addEventListener('click', async (e)=>{
+    const editBtn = e.target.closest('button[data-act="prodedit"]');
+    if(editBtn){
+      const p = products.find(x => String(x.id) === String(editBtn.dataset.id));
+      if(p) enterProductEditMode(p);
+      return;
+    }
     const btn = e.target.closest('button[data-act="proddel"]');
     if(!btn) return;
     const id = btn.dataset.id;
@@ -1574,6 +1637,7 @@ loadReviews();
 
     const { error } = await db.from('products').delete().eq('id', id);
     if(error){ showToast('Error al eliminar el producto'); console.error(error); return; }
+    if(editingProductId === id) exitProductEditMode();
     showToast('Producto eliminado');
     await loadProducts();
   });
