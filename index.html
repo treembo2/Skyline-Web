@@ -5,29 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skyline Store | Cuentas y Streaming</title>
 <meta name="description" content="Netflix, Spotify, Disney+ y más, directo por Discord. Pagás por transferencia y te entregamos enseguida.">
-<meta name="theme-color" content="#0A0E14">
+<meta name="theme-color" content="#060210">
 <meta property="og:title" content="Skyline Store | Cuentas y Streaming">
 <meta property="og:description" content="Netflix, Spotify, Disney+ y más, directo por Discord.">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <!-- Supabase SDK JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    /* Paleta Skyline Nocturno */
-    --sky-deep: #0A0E14;       /* Fondo azul casi negro */
-    --sky-panel: #131A24;      /* Tarjeta y contenedores */
-    --sky-panel-2: #1C2530;    /* Paneles secundarios / hover */
-    --sky-line: #26303C;       /* Borde sutil */
-    --horizon-orange: #FF7A45; /* Acento primario, naranja cálido */
-    --horizon-violet: #FF9D6C; /* Acento hover, tono más claro */
-    --gold: #F2B84B;           /* Resaltados y precios en dorado cálido */
-    --text-hi: #F2F4F7;        /* Texto principal casi blanco */
-    --text-mid: #97A1AD;       /* Texto secundario gris azulado */
-    --text-low: #5C6672;       /* Texto atenuado */
+    /* Paleta de marca Skyline (extraída del logo) */
+    --sky-deep: #060210;       /* Fondo violeta casi negro (igual al logo) */
+    --sky-panel: #100A1C;      /* Tarjeta y contenedores */
+    --sky-panel-2: #1B1030;    /* Paneles secundarios / hover */
+    --sky-line: #2E1B4D;       /* Borde sutil violeta */
+    --horizon-orange: #9D3EDF; /* Acento primario, violeta vibrante de marca */
+    --horizon-violet: #B968EA; /* Acento hover, tono más claro */
+    --gold: #C9A6FF;           /* Resaltados y precios en lavanda claro */
+    --text-hi: #EDE6F7;        /* Texto principal lavanda-blanco cálido */
+    --text-mid: #9C8FB5;       /* Texto secundario gris violáceo */
+    --text-low: #5C5178;       /* Texto atenuado */
     --success: #34D399;        /* Verde de éxito / disponible */
   }
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -35,12 +35,12 @@
   body{
     background:var(--sky-deep);
     color:var(--text-hi);
-    font-family:'Manrope',sans-serif;
+    font-family:'Nunito',sans-serif;
     overflow-x:hidden;
   }
-  ::selection{background:var(--horizon-violet);color:#fff;}
+  ::selection{background:var(--horizon-violet);color:#ffffff;}
 
-  .display{font-family:'Unbounded',sans-serif;}
+  .display{font-family:'Baloo 2',sans-serif;}
   .mono{font-family:'JetBrains Mono',monospace;}
 
   a{color:inherit;text-decoration:none;}
@@ -78,7 +78,7 @@
     backdrop-filter:blur(14px);
     border-bottom:1px solid var(--sky-line);
   }
-  .brand{display:flex;align-items:center;gap:10px;font-family:'Unbounded';font-weight:700;font-size:15px;letter-spacing:0.02em;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Baloo 2';font-weight:700;font-size:15px;letter-spacing:0.02em;}
   .brand-mark-img{
     width:38px;height:38px;border-radius:9px;object-fit:cover;
     display:block;
@@ -108,7 +108,7 @@
   h1.hero-title{
     font-size:clamp(44px,6.5vw,80px);
     line-height:1;font-weight:900;
-    background:linear-gradient(180deg,#F2F4F7 30%, #97A1AD 100%);
+    background:linear-gradient(180deg,var(--text-hi) 30%, var(--text-mid) 100%);
     -webkit-background-clip:text;background-clip:text;color:transparent;
     margin-bottom:20px;letter-spacing:-0.01em;
   }
@@ -120,8 +120,8 @@
   .btn-primary{
     padding:15px 30px;border-radius:12px;
     background:var(--horizon-orange);
-    color:#fff;font-weight:700;font-size:14.5px;
-    box-shadow:0 8px 24px -6px rgba(255,122,69,0.35);
+    color:#ffffff;font-weight:700;font-size:14.5px;
+    box-shadow:0 8px 24px -6px rgba(157,62,223,0.4);
     transition:.2s;
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
   }
@@ -136,11 +136,24 @@
 
   .trust-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
   .trust-pill{
-    font-size:12.5px;color:var(--text-mid);
-    padding:8px 14px;border-radius:100px;
+    font-size:12.5px;color:var(--text-hi);
+    padding:8px 16px 8px 8px;border-radius:100px;
+    background:var(--sky-panel);
     border:1px solid var(--sky-line);
-    display:flex;align-items:center;gap:7px;
+    display:flex;align-items:center;gap:9px;
+    transition:.2s;
   }
+  .trust-pill:hover{border-color:var(--text-low);background:var(--sky-panel-2);}
+  .trust-pill span{
+    font-size:13px;line-height:1;
+    width:24px;height:24px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .trust-pill:nth-child(1) span{background:rgba(157,62,223,0.2);}
+  .trust-pill:nth-child(2) span{background:rgba(201,166,255,0.2);}
+  .trust-pill:nth-child(3) span{background:rgba(52,211,153,0.2);}
+  .trust-pill:nth-child(4) span{background:rgba(185,104,234,0.2);}
 
   /* Cómo funciona */
   .how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:step;}
@@ -153,7 +166,7 @@
   .how-num{
     width:34px;height:34px;border-radius:10px;
     background:linear-gradient(135deg,var(--horizon-orange),var(--horizon-violet));
-    color:#fff;font-family:'Unbounded';font-weight:700;font-size:15px;
+    color:#ffffff;font-family:'Baloo 2';font-weight:700;font-size:15px;
     display:flex;align-items:center;justify-content:center;margin-bottom:16px;
   }
   .how-card h4{font-size:15px;margin-bottom:6px;}
@@ -168,7 +181,7 @@
   section{position:relative;z-index:1;padding:60px 48px;max-width:1180px;margin:0 auto;}
   .section-head{text-align:center;margin-bottom:36px;}
   .section-head .eyebrow{margin-bottom:14px;}
-  .section-title{font-family:'Unbounded';font-weight:700;font-size:clamp(26px,3.8vw,36px);margin-bottom:10px;}
+  .section-title{font-family:'Baloo 2';font-weight:700;font-size:clamp(26px,3.8vw,36px);margin-bottom:10px;}
   .section-desc{color:var(--text-mid);font-size:15px;}
 
   /* Filter Controls */
@@ -218,7 +231,7 @@
   .card-icon{
     width:52px;height:52px;border-radius:14px;
     background:var(--sky-panel-2);display:flex;align-items:center;justify-content:center;
-    font-size:22px;font-weight:800;font-family:'Unbounded';
+    font-size:22px;font-weight:800;font-family:'Baloo 2';
     margin-bottom:16px;border:1px solid var(--sky-line);overflow:hidden;
   }
   .logo-mask{
@@ -227,10 +240,10 @@
     -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
     -webkit-mask-position:center;mask-position:center;
   }
-  .card-icon.disney{background:#0d47c7;font-family:'Unbounded';font-weight:700;color:#fff;font-size:16px;}
+  .card-icon.disney{background:#0d47c7;font-family:'Baloo 2';font-weight:700;color:#fff;font-size:16px;}
   .card-name{font-size:16px;font-weight:700;margin-bottom:4px;}
-  .card-price{font-family:'Unbounded';font-weight:700;font-size:15px;color:var(--gold);margin-bottom:18px;}
-  .card-price span{color:var(--text-low);font-size:11px;font-family:'Manrope';font-weight:500;}
+  .card-price{font-family:'Baloo 2';font-weight:700;font-size:15px;color:var(--gold);margin-bottom:18px;}
+  .card-price span{color:var(--text-low);font-size:11px;font-family:'Nunito';font-weight:500;}
   .btn-card{
     width:100%;padding:11px;border-radius:9px;margin-top:auto;
     background:transparent;border:1px solid var(--sky-line);
@@ -272,7 +285,7 @@
     max-width:600px;margin:0 auto;background:var(--sky-panel);
     border:1px solid var(--sky-line);border-radius:16px;padding:28px;
   }
-  .add-review-box h3{font-family:'Unbounded';font-size:18px;margin-bottom:16px;text-align:center;}
+  .add-review-box h3{font-family:'Baloo 2';font-size:18px;margin-bottom:16px;text-align:center;}
   .review-form-group{margin-bottom:16px;}
   .review-form-group label{display:block;font-size:13px;color:var(--text-mid);margin-bottom:6px;}
   .review-form-input, .review-form-textarea, .review-form-select{
@@ -289,7 +302,7 @@
   }
   @media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr);}}
   .stat{background:var(--sky-panel);padding:26px 20px;text-align:center;}
-  .stat-num{font-family:'Unbounded';font-size:26px;font-weight:700;color:var(--text-hi);}
+  .stat-num{font-family:'Baloo 2';font-size:26px;font-weight:700;color:var(--text-hi);}
   .stat-label{font-size:11.5px;color:var(--text-low);text-transform:uppercase;letter-spacing:.06em;margin-top:6px;}
 
   /* Banner */
@@ -299,8 +312,26 @@
     display:flex;align-items:center;justify-content:space-between;
     gap:20px;flex-wrap:wrap;
   }
-  .banner h3{font-family:'Unbounded';font-size:24px;margin-bottom:8px;}
+  .banner h3{font-family:'Baloo 2';font-size:24px;margin-bottom:8px;}
   .banner p{color:var(--text-mid);font-size:14px;}
+
+  /* Owner */
+  .owner-card{
+    background:linear-gradient(120deg, rgba(44,62,80,0.08), rgba(26,37,47,0.04));
+    border:1px solid var(--sky-line);border-radius:20px;padding:40px 48px;
+    display:flex;align-items:center;justify-content:center;
+    gap:26px;flex-wrap:wrap;text-align:left;
+  }
+  .owner-photo{
+    width:96px;height:96px;border-radius:50%;object-fit:cover;
+    border:3px solid var(--horizon-orange);
+    box-shadow:0 0 0 4px rgba(157,62,223,0.15);
+  }
+  .owner-role{
+    font-size:11.5px;color:var(--horizon-violet);text-transform:uppercase;
+    letter-spacing:.08em;font-weight:700;margin-bottom:4px;
+  }
+  .owner-name{font-family:'Baloo 2';font-size:24px;font-weight:700;color:var(--text-hi);}
 
   footer{
     border-top:1px solid var(--sky-line);padding:0;
@@ -311,7 +342,7 @@
     display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:32px;
   }
   @media(max-width:768px){.footer-main{grid-template-columns:1fr 1fr;}}
-  .footer-brand-mark{display:flex;align-items:center;gap:10px;font-family:'Unbounded';font-weight:700;font-size:15px;color:var(--text-hi);margin-bottom:12px;}
+  .footer-brand-mark{display:flex;align-items:center;gap:10px;font-family:'Baloo 2';font-weight:700;font-size:15px;color:var(--text-hi);margin-bottom:12px;}
   .footer-brand-img{width:26px;height:26px;border-radius:7px;object-fit:cover;}
   .footer-desc{font-size:13px;line-height:1.6;max-width:280px;margin-bottom:16px;}
   .footer-socials{display:flex;gap:10px;}
@@ -332,7 +363,7 @@
   /* Cart button */
   .cart-btn{display:flex;align-items:center;gap:8px;}
   .cart-count{
-    background:var(--horizon-violet);color:#fff;
+    background:var(--horizon-violet);color:#ffffff;
     font-size:11px;font-weight:700;min-width:18px;height:18px;
     border-radius:100px;display:inline-flex;align-items:center;justify-content:center;
     padding:0 5px;
@@ -355,7 +386,7 @@
     display:flex;align-items:center;justify-content:space-between;
     padding:22px 24px;border-bottom:1px solid var(--sky-line);
   }
-  .panel-header h3{font-family:'Unbounded';font-size:17px;font-weight:600;}
+  .panel-header h3{font-family:'Baloo 2';font-size:17px;font-weight:600;}
   .panel-close{
     width:32px;height:32px;border-radius:9px;
     background:var(--sky-panel-2);border:1px solid var(--sky-line);
@@ -476,7 +507,7 @@
   }
   .pd-icon .logo-mask{width:32px;height:32px;}
   .pd-tag{font-size:12px;color:var(--text-low);margin-bottom:4px;}
-  .pd-name{font-family:'Unbounded';font-weight:700;font-size:18px;margin-bottom:6px;}
+  .pd-name{font-family:'Baloo 2';font-weight:700;font-size:18px;margin-bottom:6px;}
   .pd-desc{color:var(--text-mid);font-size:14px;line-height:1.6;margin-bottom:20px;}
   .pd-price-row{
     display:flex;justify-content:space-between;align-items:center;
@@ -484,7 +515,7 @@
     border:1px solid var(--sky-line);
   }
   .pd-price-row span{color:var(--text-low);font-size:13px;}
-  .pd-price-row b{font-family:'Unbounded';font-weight:700;font-size:20px;color:var(--gold);}
+  .pd-price-row b{font-family:'Baloo 2';font-weight:700;font-size:20px;color:var(--gold);}
   .card{cursor:pointer;}
   .order-code-row{
     display:flex;align-items:center;justify-content:space-between;
@@ -507,7 +538,7 @@
   .step-item:first-child .step-connector{display:none;}
   .step-label{font-size:11px;color:var(--text-low);line-height:1.4;max-width:90px;}
   .step-item.active .step-dot{
-    background:var(--horizon-violet);border-color:var(--horizon-violet);color:#fff;
+    background:var(--horizon-violet);border-color:var(--horizon-violet);color:#ffffff;
     box-shadow:0 0 0 4px rgba(44,62,80,0.15);
   }
   .step-item.active .step-label{color:var(--text-hi);font-weight:600;}
@@ -553,9 +584,10 @@
     <a href="#faq" class="btn-secondary">Preguntas frecuentes</a>
   </div>
   <div class="trust-row">
-    <div class="trust-pill">Entrega en el día</div>
-    <div class="trust-pill">Te reponemos si falla algo</div>
-    <div class="trust-pill">Staff en Discord</div>
+    <div class="trust-pill"><span>⚡</span> Entrega en el día</div>
+    <div class="trust-pill"><span>🔁</span> Reposición si falla</div>
+    <div class="trust-pill"><span>🛡️</span> Compra 100% segura</div>
+    <div class="trust-pill"><span>💬</span> Staff en Discord</div>
   </div>
 </div>
 
@@ -613,9 +645,7 @@
   <div class="grid" id="productGrid">
     <!-- Steam -->
     <div class="card" data-cat="juegos" data-desc="Cuenta de Steam con acceso completo por 30 a 60 días. Podés cambiar el correo y la clave apenas la recibís." data-name="Steam Account" data-price="30" data-icon-bg="#171a21" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg" data-icon-fill="#fff">
-      <div class="card-top">
-        <div class="card-tag">Full Access (30-60 días)</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 14 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 14 disponibles</div>
       </div>
       <div class="card-icon" style="background:#171a21;">
         <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/steam.svg');"></div>
@@ -627,9 +657,7 @@
 
     <!-- Rockstar -->
     <div class="card" data-cat="juegos" data-desc="Cuenta de Rockstar Games lista para usar en servidores de FiveM. No incluye GTA V activado." data-name="Rockstar Account" data-price="250" data-icon-bg="#fcaf17" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg" data-icon-fill="#000">
-      <div class="card-top">
-        <div class="card-tag">FiveM Fresh (No GTA V)</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 6 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 6 disponibles</div>
       </div>
       <div class="card-icon" style="background:#fcaf17;">
         <div class="logo-mask" style="background:#000;-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/rockstargames.svg');"></div>
@@ -641,9 +669,7 @@
 
     <!-- Discord -->
     <div class="card" data-cat="juegos" data-desc="Cuenta de Discord con acceso completo, incluye el correo asociado. Podés modificarla como quieras." data-name="Discord Account" data-price="250" data-icon-bg="#5865F2" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg" data-icon-fill="#fff">
-      <div class="card-top">
-        <div class="card-tag">Full Access + Mail</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 22 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 22 disponibles</div>
       </div>
       <div class="card-icon" style="background:#5865F2;">
         <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/discord.svg');"></div>
@@ -655,9 +681,7 @@
 
     <!-- IPVanish -->
     <div class="card" data-cat="vpn" data-desc="Cuenta premium de IPVanish, lista para usar con los datos que te entregamos." data-name="IPVanish VPN" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg" data-icon-fill="#44B035">
-      <div class="card-top">
-        <div class="card-tag">NFA Premium</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 9 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 9 disponibles</div>
       </div>
       <div class="card-icon" style="background:#000;">
         <div class="logo-mask" style="background:#44B035;-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/ipvanish.svg');"></div>
@@ -669,9 +693,7 @@
 
     <!-- NordVPN -->
     <div class="card" data-cat="vpn" data-desc="Cuenta premium de NordVPN, acceso inmediato con los datos de inicio de sesión." data-name="NordVPN Account" data-price="2000" data-icon-bg="#4687FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg" data-icon-fill="#fff">
-      <div class="card-top">
-        <div class="card-tag">NFA Premium</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 5 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 5 disponibles</div>
       </div>
       <div class="card-icon" style="background:#4687FF;">
         <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nordvpn.svg');"></div>
@@ -683,9 +705,7 @@
 
     <!-- ChatGPT Plus -->
     <div class="card" data-cat="ia" data-desc="Cuenta de ChatGPT Plus con acceso completo a correo y clave, incluye todos los modelos del plan." data-name="ChatGPT Plus" data-price="6000" data-icon-bg="#10a37f" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg" data-icon-fill="#fff">
-      <div class="card-top">
-        <div class="card-tag">Full Access (Mail:Clave)</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 11 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 11 disponibles</div>
       </div>
       <div class="card-icon" style="background:#10a37f;">
         <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/openai.svg');"></div>
@@ -697,9 +717,7 @@
 
     <!-- Disney+ -->
     <div class="card" data-cat="streaming" data-desc="Cuenta de Disney+ lista para usar, con perfil individual." data-name="Disney+" data-price="1000" data-icon-color="disney" data-icon-content="D+">
-      <div class="card-top">
-        <div class="card-tag">NFA</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 18 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 18 disponibles</div>
       </div>
       <div class="card-icon disney">D+</div>
       <div class="card-name">Disney+</div>
@@ -709,9 +727,7 @@
 
     <!-- Netflix -->
     <div class="card" data-cat="streaming" data-desc="Cuenta de Netflix con acceso vitalicio y perfil propio." data-name="Netflix" data-price="3000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg" data-icon-fill="#E50914">
-      <div class="card-top">
-        <div class="card-tag">Acceso Vitalicio</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 27 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 27 disponibles</div>
       </div>
       <div class="card-icon" style="background:#000;">
         <div class="logo-mask" style="background:#E50914;-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/netflix.svg');"></div>
@@ -723,9 +739,7 @@
 
     <!-- HBO Max -->
     <div class="card" data-cat="streaming" data-desc="Cuenta de HBO Max lista para usar, con perfil individual." data-name="HBO Max" data-price="1000" data-icon-bg="#000" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg" data-icon-fill="#fff">
-      <div class="card-top">
-        <div class="card-tag">NFA</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 8 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 8 disponibles</div>
       </div>
       <div class="card-icon" style="background:#000;">
         <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/hbomax.svg');"></div>
@@ -737,9 +751,7 @@
 
     <!-- Crunchyroll -->
     <div class="card" data-cat="anime" data-desc="Cuenta de Crunchyroll para ver anime sin publicidad, con perfil individual." data-name="Crunchyroll" data-price="1250" data-icon-bg="#F47521" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg" data-icon-fill="#fff">
-      <div class="card-top">
-        <div class="card-tag">NFA</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 4 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 4 disponibles</div>
       </div>
       <div class="card-icon" style="background:#F47521;">
         <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/crunchyroll.svg');"></div>
@@ -751,9 +763,7 @@
 
     <!-- Paramount+ -->
     <div class="card" data-cat="streaming" data-desc="Cuenta de Paramount+ lista para usar, con perfil individual." data-name="Paramount+" data-price="1500" data-icon-bg="#0064FF" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg" data-icon-fill="#fff">
-      <div class="card-top">
-        <div class="card-tag">NFA</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 12 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 12 disponibles</div>
       </div>
       <div class="card-icon" style="background:#0064FF;">
         <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/paramountplus.svg');"></div>
@@ -765,9 +775,7 @@
 
     <!-- Spotify -->
     <div class="card" data-cat="musica" data-desc="Cuenta de Spotify Premium con acceso completo, podés cambiar el correo y la clave." data-name="Spotify" data-price="3500" data-icon-bg="#1DB954" data-icon-mask="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg" data-icon-fill="#fff">
-      <div class="card-top">
-        <div class="card-tag">FA (Full Access)</div>
-        <div class="stock-badge"><span class="stock-dot"></span> 16 disponibles</div>
+      <div class="card-top">        <div class="stock-badge"><span class="stock-dot"></span> 16 disponibles</div>
       </div>
       <div class="card-icon" style="background:#1DB954;">
         <div class="logo-mask" style="-webkit-mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg');mask-image:url('https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/spotify.svg');"></div>
@@ -848,12 +856,12 @@
 </section>
 
 <section id="soporte">
-  <div class="banner">
+  <div class="owner-card">
+    <img src="owner-treembolona.jpg" alt="Treembolona" class="owner-photo">
     <div>
-      <h3>¿Te quedó alguna duda?</h3>
-      <p>Escribinos por Discord, siempre hay alguien del staff para responderte.</p>
+      <div class="owner-role">Owner</div>
+      <div class="owner-name">Treembolona</div>
     </div>
-    <a href="https://discord.gg/B3wp4Ygv8J" target="_blank" class="btn-primary">Unirme al Discord</a>
   </div>
 </section>
 
