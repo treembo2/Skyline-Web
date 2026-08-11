@@ -1989,18 +1989,6 @@ loadReviews();
     });
   });
 
-  // ===== Notificaciones de compras recientes (prueba social) =====
-  const recentProducts = ['Netflix','Spotify','Disney+','ChatGPT Plus','HBO Max','Crunchyroll','Discord Account','NordVPN Account'];
-  const recentNames = ['Fede','Male','Tomi','Nacho','Bren','Vale','Ezequiel','Cami','Santi','Agus'];
-  function showPurchaseToast(){
-    const product = recentProducts[Math.floor(Math.random()*recentProducts.length)];
-    const name = recentNames[Math.floor(Math.random()*recentNames.length)];
-    const mins = Math.floor(Math.random()*12)+1;
-    showToast('<b>'+name+'</b> compró <b>'+product+'</b> hace '+mins+' min');
-  }
-  setTimeout(showPurchaseToast, 8000);
-  setInterval(showPurchaseToast, 35000);
-
 })();
 </script>
 
