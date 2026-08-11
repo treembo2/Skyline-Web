@@ -216,6 +216,24 @@
   .admin-tab-btn.active{background:var(--horizon-orange);border-color:var(--horizon-orange);color:#fff;}
   .card-icon-text{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
 
+  /* Login obligatorio */
+  .auth-gate{position:fixed;inset:0;z-index:200;background:var(--sky-deep);display:flex;align-items:center;justify-content:center;padding:20px;}
+  .auth-gate-box{width:100%;max-width:380px;background:var(--sky-panel);border:1px solid var(--sky-line);border-radius:18px;padding:32px 28px;text-align:center;}
+  .auth-gate-logo{width:52px;height:52px;border-radius:12px;margin-bottom:14px;object-fit:cover;}
+  .auth-gate-box h3{font-family:'Baloo 2';font-size:19px;margin-bottom:6px;color:var(--text-hi);}
+  .auth-gate-sub{color:var(--text-low);font-size:13px;margin-bottom:20px;line-height:1.5;}
+  .auth-gate-divider{color:var(--text-low);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;margin:18px 0 14px;}
+  .auth-gate-error{color:#F87171;font-size:12.5px;margin-top:10px;min-height:16px;}
+  .auth-gate-info{color:var(--success);font-size:12.5px;margin-top:10px;min-height:16px;}
+
+  /* Badge de usuario logueado */
+  .user-badge{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:100px;background:var(--sky-panel);border:1px solid var(--sky-line);}
+  .user-avatar-img{width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;}
+  .user-avatar-fallback{width:28px;height:28px;border-radius:50%;background:var(--horizon-violet);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+  .user-badge span{font-size:12.5px;color:var(--text-mid);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .user-badge button{background:transparent;border:none;color:var(--text-low);font-size:14px;cursor:pointer;line-height:1;}
+  .user-badge button:hover{color:var(--text-hi);}
+
   /* Grid & Cards */
   .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
   @media(max-width:920px){.grid{grid-template-columns:repeat(2,1fr);}}
@@ -552,13 +570,43 @@
 </head>
 <body>
 
+<!-- ===== Login obligatorio ===== -->
+<div id="authGateOverlay" class="auth-gate">
+  <div class="auth-gate-box">
+    <img src="skyline-logo-icon.png" alt="Skyline Store" class="auth-gate-logo">
+    <h3>Ingresá a Skyline Store</h3>
+    <p class="auth-gate-sub">Necesitás una cuenta para ver el catálogo y comprar.</p>
+
+    <button class="btn-primary btn-full" id="authDiscordBtn" style="background:#5865F2;">💬 Continuar con Discord</button>
+
+    <div class="auth-gate-divider">o con tu email</div>
+
+    <div class="review-form-group" style="text-align:left;">
+      <input type="email" id="authEmailInput" class="review-form-input" placeholder="tu@email.com" autocomplete="username">
+    </div>
+    <div class="review-form-group" style="text-align:left;">
+      <input type="password" id="authPasswordInput" class="review-form-input" placeholder="Contraseña" autocomplete="current-password">
+    </div>
+
+    <button class="btn-primary btn-full" id="authLoginBtn" type="button">Iniciar sesión</button>
+    <button class="btn-ghost btn-full" id="authSignupBtn" type="button" style="margin-top:8px;">Crear cuenta nueva</button>
+
+    <div id="authError" class="auth-gate-error"></div>
+    <div id="authInfo" class="auth-gate-info"></div>
+  </div>
+</div>
+
+
 <div class="glow-field"></div>
 <div id="toastContainer" class="toast-container"></div>
 
 <header>
-  <a href="#" class="brand">
-    <img src="skyline-logo-icon.png" alt="Skyline Store" class="brand-mark-img">
-  </a>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div id="userBadge" class="user-badge" style="display:none;"></div>
+    <a href="#" class="brand">
+      <img src="skyline-logo-icon.png" alt="Skyline Store" class="brand-mark-img">
+    </a>
+  </div>
   <nav>
     <a href="#tienda">Tienda</a>
     <a href="#testimonios">Reseñas</a>
@@ -604,7 +652,7 @@
     <div class="how-card">
       <div class="how-num">3</div>
       <h4>Abrís un ticket</h4>
-      <p>Copiás el resumen del pedido y lo pegás en Discord junto con el comprobante.</p>
+      <p>Nos avisás quién hizo la transferencia y verificamos el pago antes de que abras el ticket.</p>
     </div>
     <div class="how-card">
       <div class="how-num">4</div>
@@ -690,7 +738,7 @@
   <div class="faq-list">
     <div class="faq-item">
       <div class="faq-question"><span>¿Cómo recibo los datos de mi cuenta?</span><span class="faq-icon">▼</span></div>
-      <div class="faq-answer">Cuando pagás, copiás el resumen de tu pedido y abrís un ticket en Discord con el comprobante. De ahí lo toma el staff y te pasa los datos.</div>
+      <div class="faq-answer">Cuando pagás, escribís el nombre de quien hizo la transferencia y tocás "Chequear pago". Nosotros verificamos el comprobante y, una vez aprobado, te dejamos copiar el resumen y abrir el ticket en Discord para que te pasen los datos.</div>
     </div>
     <div class="faq-item">
       <div class="faq-question"><span>¿Qué significa NFA / FA?</span><span class="faq-icon">▼</span></div>
@@ -809,12 +857,36 @@
         </div>
       </div>
 
-      <p class="pay-note">Hacé la transferencia por el monto exacto. Al finalizar, hacé clic abajo para copiar tu resumen y abrir Discord para enviar tu comprobante en el ticket.</p>
+      <div id="checkoutFlowIdle">
+        <p class="pay-note">Hacé la transferencia por el monto exacto. Cuando termines, escribí el nombre de quien hizo la transferencia y tocá "Chequear pago" para que lo verifiquemos.</p>
+        <div class="review-form-group">
+          <label>Nombre de quien transfiere</label>
+          <input type="text" id="payerNameInput" class="review-form-input" placeholder="Nombre y apellido">
+        </div>
+        <button class="btn-primary btn-full" id="btnCheckPayment" type="button">Chequear pago</button>
+      </div>
 
-      <div style="margin-bottom:24px;">
+      <div id="checkoutFlowReview" style="display:none;text-align:center;padding:6px 0 4px;">
+        <div style="font-size:32px;margin-bottom:8px;">🔎</div>
+        <p style="color:var(--text-mid);font-size:13.5px;line-height:1.6;margin-bottom:16px;">Estamos revisando tu comprobante. Esto puede tardar unos minutos — no hace falta que cierres esta ventana, te avisamos apenas esté listo.</p>
+        <button class="btn-ghost" id="btnRefreshStatus" type="button">Actualizar estado</button>
+      </div>
+
+      <div id="checkoutFlowApproved" style="display:none;">
+        <div style="text-align:center;margin-bottom:14px;">
+          <div style="font-size:32px;margin-bottom:8px;">✅</div>
+          <p style="color:var(--success);font-size:14px;font-weight:600;">¡Pago aprobado!</p>
+        </div>
+        <p class="pay-note">Copiá el resumen y abrí un ticket en Discord para retirar tu producto.</p>
         <a id="btnDiscordTicket" href="https://discord.gg/B3wp4Ygv8J" target="_blank" class="btn-primary btn-full">
           💬 Copiar Resumen y Abrir Discord
         </a>
+      </div>
+
+      <div id="checkoutFlowRejected" style="display:none;text-align:center;padding:6px 0 4px;">
+        <div style="font-size:32px;margin-bottom:8px;">❌</div>
+        <p style="color:#F87171;font-size:13.5px;line-height:1.6;margin-bottom:16px;">No pudimos verificar tu comprobante. Contactanos por Discord para resolverlo.</p>
+        <a href="https://discord.gg/B3wp4Ygv8J" target="_blank" class="btn-primary btn-full">💬 Hablar por Discord</a>
       </div>
     </div>
   </div>
@@ -857,17 +929,7 @@
     </div>
     <div class="panel-body">
       <div id="catAuthGate">
-        <p style="color:var(--text-mid);font-size:13.5px;line-height:1.5;margin-bottom:14px;">Iniciá sesión con tu cuenta de administrador para gestionar categorías y productos.</p>
-        <div class="review-form-group">
-          <label>Email</label>
-          <input type="email" id="catAuthEmail" class="review-form-input" placeholder="admin@tumail.com" autocomplete="username">
-        </div>
-        <div class="review-form-group">
-          <label>Contraseña</label>
-          <input type="password" id="catAuthPassword" class="review-form-input" placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <button class="btn-primary btn-full" id="catAuthBtn">Iniciar sesión</button>
-        <div id="catAuthError" style="color:#F87171;font-size:12.5px;margin-top:10px;"></div>
+        <p style="color:var(--text-mid);font-size:13.5px;line-height:1.5;">Esta sección es solo para administradores. Estás logueado, pero tu cuenta no tiene permisos de admin.</p>
       </div>
 
       <div id="catManager" style="display:none;">
@@ -875,8 +937,8 @@
           <div class="filter-tabs" style="gap:6px;">
             <button class="admin-tab-btn active" id="tabBtnCategories" data-tab="tabCategories">Categorías</button>
             <button class="admin-tab-btn" id="tabBtnProducts" data-tab="tabProducts">Productos</button>
+            <button class="admin-tab-btn" id="tabBtnOrders" data-tab="tabOrders">Pedidos</button>
           </div>
-          <button id="catLogoutBtn" style="background:transparent;border:none;color:var(--text-low);font-size:12px;text-decoration:underline;">Cerrar sesión</button>
         </div>
 
         <!-- Tab: Categorías -->
@@ -953,6 +1015,12 @@
 
           <div style="font-size:12.5px;color:var(--text-low);margin-bottom:10px;">Editá precio y stock directo en la lista — se guardan solos al salir del campo.</div>
           <div id="prodList"></div>
+        </div>
+
+        <!-- Tab: Pedidos -->
+        <div id="tabOrders" style="display:none;">
+          <div style="font-size:12.5px;color:var(--text-low);margin-bottom:10px;">Los pedidos con pago en revisión aparecen acá. Aceptalos o rechazalos según el comprobante.</div>
+          <div id="orderList"></div>
         </div>
       </div>
     </div>
@@ -1033,6 +1101,97 @@ loadReviews();
     container.appendChild(toast);
     setTimeout(()=> toast.remove(), 3000);
   };
+
+  // --- Login obligatorio + admin ---
+  let isAdminUser = false;
+
+  const authGateOverlay = document.getElementById('authGateOverlay');
+  const authErrorEl = document.getElementById('authError');
+  const authInfoEl = document.getElementById('authInfo');
+  const userBadgeEl = document.getElementById('userBadge');
+
+  function setAuthError(msg){ authErrorEl.textContent = msg; authInfoEl.textContent = ''; }
+  function setAuthInfo(msg){ authInfoEl.textContent = msg; authErrorEl.textContent = ''; }
+
+  function renderUserBadge(user){
+    if(!user){ userBadgeEl.style.display = 'none'; userBadgeEl.innerHTML = ''; return; }
+    const avatarUrl = user.user_metadata && user.user_metadata.avatar_url;
+    const label = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name)) || user.email || 'Usuario';
+    const initial = label.trim().charAt(0).toUpperCase() || '?';
+
+    userBadgeEl.innerHTML = (avatarUrl
+      ? '<img class="user-avatar-img" src="'+avatarUrl+'" alt="">'
+      : '<div class="user-avatar-fallback">'+initial+'</div>'
+    ) + '<span>'+label+'</span><button id="userLogoutBtn" title="Cerrar sesión">⎋</button>';
+
+    userBadgeEl.style.display = 'flex';
+    document.getElementById('userLogoutBtn').addEventListener('click', async ()=>{
+      await db.auth.signOut();
+    });
+  }
+
+  async function refreshAdminStatus(user){
+    if(!user){ isAdminUser = false; return; }
+    try{
+      const { data } = await db.from('admins').select('user_id').eq('user_id', user.id).maybeSingle();
+      isAdminUser = !!data;
+    }catch(err){ isAdminUser = false; }
+  }
+
+  async function unlockSite(user){
+    authGateOverlay.style.display = 'none';
+    renderUserBadge(user);
+    await refreshAdminStatus(user);
+  }
+
+  function lockSite(){
+    authGateOverlay.style.display = 'flex';
+    document.getElementById('authEmailInput').value = '';
+    document.getElementById('authPasswordInput').value = '';
+    setAuthError('');
+    isAdminUser = false;
+    renderUserBadge(null);
+  }
+
+  db.auth.getSession().then(({ data })=>{
+    if(data && data.session) unlockSite(data.session.user);
+  });
+
+  db.auth.onAuthStateChange((event, session)=>{
+    if(session && session.user){ unlockSite(session.user); }
+    else { lockSite(); }
+  });
+
+  document.getElementById('authDiscordBtn').addEventListener('click', async ()=>{
+    setAuthError('');
+    const { error } = await db.auth.signInWithOAuth({
+      provider: 'discord',
+      options: { redirectTo: window.location.href.split('#')[0] }
+    });
+    if(error){ setAuthError('No se pudo iniciar con Discord.'); console.error(error); }
+  });
+
+  document.getElementById('authLoginBtn').addEventListener('click', async ()=>{
+    const email = document.getElementById('authEmailInput').value.trim();
+    const password = document.getElementById('authPasswordInput').value;
+    if(!email || !password){ setAuthError('Completá email y contraseña.'); return; }
+    setAuthError('');
+    const { error } = await db.auth.signInWithPassword({ email, password });
+    if(error){ setAuthError('Email o contraseña incorrectos.'); console.error(error); }
+  });
+
+  document.getElementById('authSignupBtn').addEventListener('click', async ()=>{
+    const email = document.getElementById('authEmailInput').value.trim();
+    const password = document.getElementById('authPasswordInput').value;
+    if(!email || !password){ setAuthError('Completá email y contraseña.'); return; }
+    if(password.length < 6){ setAuthError('La contraseña debe tener al menos 6 caracteres.'); return; }
+    setAuthError('');
+    const { data, error } = await db.auth.signUp({ email, password });
+    if(error){ setAuthError('No se pudo crear la cuenta (¿ya existe ese email?).'); console.error(error); return; }
+    if(!data.session){
+      setAuthInfo('Cuenta creada. Revisá tu correo para confirmar antes de iniciar sesión.');
+    }
+  });
 
   const cartOverlay = document.getElementById('cartOverlay');
   const checkoutOverlay = document.getElementById('checkoutOverlay');
@@ -1127,72 +1286,41 @@ loadReviews();
     categories = data || [];
     renderFilterTabs();
     populateProductCategorySelect();
-    if(catUnlocked) renderCatManagerList();
+    if(isAdminUser && categoryEditorOverlay.classList.contains('open')) renderCatManagerList();
   }
 
   // --- Editor de categorías (admin, con Supabase Auth real) ---
-  let catUnlocked = false;
   const categoryEditorOverlay = document.getElementById('categoryEditorOverlay');
   const catAuthGate = document.getElementById('catAuthGate');
   const catManager = document.getElementById('catManager');
   const catList = document.getElementById('catList');
 
-  document.getElementById('openCategoryEditor').addEventListener('click', ()=> categoryEditorOverlay.classList.add('open'));
+  document.getElementById('openCategoryEditor').addEventListener('click', ()=>{
+    categoryEditorOverlay.classList.add('open');
+    if(isAdminUser){
+      catAuthGate.style.display = 'none';
+      catManager.style.display = 'block';
+      renderCatManagerList();
+      renderProdManagerList();
+      loadOrdersAdmin();
+    } else {
+      catAuthGate.style.display = 'block';
+      catManager.style.display = 'none';
+    }
+  });
   document.getElementById('closeCategoryEditor').addEventListener('click', ()=> categoryEditorOverlay.classList.remove('open'));
   categoryEditorOverlay.addEventListener('click', (e)=>{ if(e.target===categoryEditorOverlay) categoryEditorOverlay.classList.remove('open'); });
 
-  function showCatManager(){
-    catUnlocked = true;
-    catAuthGate.style.display = 'none';
-    catManager.style.display = 'block';
-    document.getElementById('catAuthError').textContent = '';
-    renderCatManagerList();
-    renderProdManagerList();
-  }
-
-  // Pestañas Categorías / Productos dentro del panel admin
+  // Pestañas Categorías / Productos / Pedidos dentro del panel admin
   document.querySelectorAll('.admin-tab-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.admin-tab-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('tabCategories').style.display = btn.dataset.tab === 'tabCategories' ? 'block' : 'none';
       document.getElementById('tabProducts').style.display = btn.dataset.tab === 'tabProducts' ? 'block' : 'none';
+      document.getElementById('tabOrders').style.display = btn.dataset.tab === 'tabOrders' ? 'block' : 'none';
+      if(btn.dataset.tab === 'tabOrders') loadOrdersAdmin();
     });
-  });
-
-  function showCatAuthGate(){
-    catUnlocked = false;
-    catManager.style.display = 'none';
-    catAuthGate.style.display = 'block';
-    document.getElementById('catAuthEmail').value = '';
-    document.getElementById('catAuthPassword').value = '';
-  }
-
-  // Si ya había una sesión activa (login previo guardado por Supabase), entra directo
-  db.auth.getSession().then(({ data })=>{
-    if(data && data.session) showCatManager();
-  });
-
-  document.getElementById('catAuthBtn').addEventListener('click', async ()=>{
-    const email = document.getElementById('catAuthEmail').value.trim();
-    const password = document.getElementById('catAuthPassword').value;
-    const errEl = document.getElementById('catAuthError');
-    errEl.textContent = '';
-
-    if(!email || !password){ errEl.textContent = 'Completá email y contraseña.'; return; }
-
-    const { error } = await db.auth.signInWithPassword({ email, password });
-    if(error){
-      errEl.textContent = 'Email o contraseña incorrectos.';
-      console.error(error);
-      return;
-    }
-    showCatManager();
-  });
-
-  document.getElementById('catLogoutBtn').addEventListener('click', async ()=>{
-    await db.auth.signOut();
-    showCatAuthGate();
   });
 
   function renderCatManagerList(){
@@ -1306,7 +1434,7 @@ loadReviews();
     }
     products = data || [];
     renderProductGrid();
-    if(catUnlocked) renderProdManagerList();
+    if(isAdminUser && categoryEditorOverlay.classList.contains('open')) renderProdManagerList();
   }
 
   loadProducts();
@@ -1427,6 +1555,58 @@ loadReviews();
     renderProductGrid();
   });
 
+  // --- Gestión de pedidos (admin) ---
+  const orderList = document.getElementById('orderList');
+
+  function orderStatusLabel(s){
+    return { pendiente:'Pendiente', en_revision:'En revisión', aprobado:'Aprobado', rechazado:'Rechazado' }[s] || s;
+  }
+  function orderStatusColor(s){
+    return { pendiente:'var(--text-low)', en_revision:'#FBBF24', aprobado:'var(--success)', rechazado:'#F87171' }[s] || 'var(--text-low)';
+  }
+
+  async function loadOrdersAdmin(){
+    const { data, error } = await db.from('orders').select('*').order('created_at', { ascending: false }).limit(50);
+    if(error){ console.error('No se pudieron cargar los pedidos:', error); return; }
+    renderOrderList(data || []);
+  }
+
+  function renderOrderList(orders){
+    if(orders.length === 0){
+      orderList.innerHTML = '<div class="cart-empty">No hay pedidos todavía.</div>';
+      return;
+    }
+    orderList.innerHTML = orders.map(o=>{
+      const itemsText = (o.items||[]).map(i=>i.qty+'x '+i.name).join(', ');
+      const canAct = o.status === 'en_revision' || o.status === 'pendiente';
+      return '<div class="cart-item" style="align-items:flex-start;">'
+        + '<div class="cart-item-info" style="flex:1;">'
+          + '<div class="cart-item-name">'+o.code+' — '+(o.payer_name || 'sin nombre todavía')+'</div>'
+          + '<div class="cart-item-price" style="margin-bottom:4px;">'+itemsText+' · '+fmtPrice(o.total)+'</div>'
+          + '<div style="font-size:11.5px;color:'+orderStatusColor(o.status)+';font-weight:600;">'+orderStatusLabel(o.status)+'</div>'
+        + '</div>'
+        + (canAct
+            ? '<div style="display:flex;flex-direction:column;gap:6px;">'
+                + '<button class="btn-primary" data-act="ordok" data-code="'+o.code+'" style="padding:6px 12px;font-size:12px;">Aceptar</button>'
+                + '<button class="btn-ghost" data-act="ordno" data-code="'+o.code+'" style="padding:6px 12px;font-size:12px;">Rechazar</button>'
+              + '</div>'
+            : '')
+      + '</div>';
+    }).join('');
+  }
+
+  orderList.addEventListener('click', async (e)=>{
+    const btn = e.target.closest('button[data-act]');
+    if(!btn) return;
+    const code = btn.dataset.code;
+    const newStatus = btn.dataset.act === 'ordok' ? 'aprobado' : 'rechazado';
+
+    const { error } = await db.from('orders').update({ status: newStatus }).eq('code', code);
+    if(error){ showToast('No se pudo actualizar el pedido'); console.error(error); return; }
+    showToast(newStatus === 'aprobado' ? 'Pedido aprobado' : 'Pedido rechazado');
+    loadOrdersAdmin();
+  });
+
   function addProductToCart(card){
     const name = card.dataset.name;
     const price = parseInt(card.dataset.price, 10);
@@ -1475,6 +1655,7 @@ loadReviews();
   });
 
   function renderCart(){
+    currentOrderCode = null; // el carrito cambió: el próximo checkout arma un pedido nuevo
     const totalQty = cart.reduce((s,i)=>s+i.qty,0);
     cartCountEl.textContent = totalQty;
     
@@ -1530,6 +1711,38 @@ loadReviews();
     return Math.max(0, Math.round(sub - couponDiscount));
   }
 
+  // --- Flujo de verificación de pago ---
+  let orderChannel = null;
+
+  function showCheckoutStep(status){
+    const idle = document.getElementById('checkoutFlowIdle');
+    const review = document.getElementById('checkoutFlowReview');
+    const approved = document.getElementById('checkoutFlowApproved');
+    const rejected = document.getElementById('checkoutFlowRejected');
+    idle.style.display = 'none';
+    review.style.display = 'none';
+    approved.style.display = 'none';
+    rejected.style.display = 'none';
+
+    if(status === 'en_revision') review.style.display = 'block';
+    else if(status === 'aprobado') approved.style.display = 'block';
+    else if(status === 'rechazado') rejected.style.display = 'block';
+    else idle.style.display = 'block';
+  }
+
+  function subscribeOrderStatus(code){
+    if(orderChannel){ db.removeChannel(orderChannel); orderChannel = null; }
+    orderChannel = db.channel('order-status-'+code)
+      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'orders', filter:'code=eq.'+code }, (payload)=>{
+        const newStatus = payload.new.status;
+        if(newStatus === 'aprobado' || newStatus === 'rechazado'){
+          showCheckoutStep(newStatus);
+          showToast(newStatus === 'aprobado' ? '¡Tu pago fue aprobado!' : 'Tu pago fue rechazado');
+        }
+      })
+      .subscribe();
+  }
+
   async function openCheckout(){
     couponDiscount = 0;
     appliedCoupon = null;
@@ -1545,23 +1758,61 @@ loadReviews();
       '<div class="summary-item"><span>'+i.qty+'x '+i.name+'</span><b>'+fmt(i.price * i.qty)+'</b></div>'
     ).join('');
 
-    if(!currentOrderCode){
-      currentOrderCode = genOrderCode();
+    let existingOrder = null;
+    if(currentOrderCode){
+      try{
+        const { data } = await db.from('orders').select('*').eq('code', currentOrderCode).maybeSingle();
+        existingOrder = data;
+      }catch(err){ console.error(err); }
     }
 
-    // Guarda el pedido en Supabase para poder rastrearlo (requiere tabla "orders")
-    try{
-      await db.from('orders').upsert({
-        code: currentOrderCode,
-        items: cart.map(i=>({ name:i.name, qty:i.qty, price:i.price })),
-        total: checkoutTotalRaw(),
-        status: 'pendiente'
-      }, { onConflict: 'code' });
-    }catch(err){ console.error('No se pudo guardar el pedido en Supabase:', err); }
+    if(!existingOrder){
+      currentOrderCode = genOrderCode();
+      try{
+        await db.from('orders').insert({
+          code: currentOrderCode,
+          items: cart.map(i=>({ name:i.name, qty:i.qty, price:i.price })),
+          total: checkoutTotalRaw(),
+          status: 'pendiente'
+        });
+      }catch(err){ console.error('No se pudo guardar el pedido en Supabase:', err); }
+      document.getElementById('payerNameInput').value = '';
+      showCheckoutStep('pendiente');
+    } else {
+      // Ya existía: actualiza items/total sin tocar el status
+      try{
+        await db.from('orders').update({
+          items: cart.map(i=>({ name:i.name, qty:i.qty, price:i.price })),
+          total: checkoutTotalRaw()
+        }).eq('code', currentOrderCode);
+      }catch(err){ console.error(err); }
+      document.getElementById('payerNameInput').value = existingOrder.payer_name || '';
+      showCheckoutStep(existingOrder.status || 'pendiente');
+      if(existingOrder.status === 'en_revision') subscribeOrderStatus(currentOrderCode);
+    }
 
     closeCart();
     checkoutOverlay.classList.add('open');
   }
+
+  document.getElementById('btnCheckPayment').addEventListener('click', async ()=>{
+    const name = document.getElementById('payerNameInput').value.trim();
+    if(!name){ showToast('Escribí el nombre de quien hizo la transferencia'); return; }
+    if(!currentOrderCode) return;
+
+    const { error } = await db.from('orders').update({ payer_name: name, status: 'en_revision' }).eq('code', currentOrderCode);
+    if(error){ showToast('No se pudo enviar, probá de nuevo'); console.error(error); return; }
+
+    showCheckoutStep('en_revision');
+    subscribeOrderStatus(currentOrderCode);
+  });
+
+  document.getElementById('btnRefreshStatus').addEventListener('click', async ()=>{
+    if(!currentOrderCode) return;
+    const { data, error } = await db.from('orders').select('status,payer_name').eq('code', currentOrderCode).maybeSingle();
+    if(error){ console.error(error); return; }
+    if(data) showCheckoutStep(data.status);
+  });
 
   document.getElementById('applyCouponBtn').addEventListener('click', async ()=>{
     const input = document.getElementById('couponInput');
@@ -1598,15 +1849,17 @@ loadReviews();
   btnDiscordTicket.addEventListener('click', ()=>{
     let itemsText = cart.map(i => `${i.qty}x ${i.name}`).join(', ');
     let total = checkoutTotalRaw();
+    let payerName = document.getElementById('payerNameInput').value.trim();
     let summaryText = `🛒 *NUEVO PEDIDO SKYLINE STORE*\n`
                     + `• Código: ${currentOrderCode}\n`
+                    + `• Transferido por: ${payerName}\n`
                     + `• Productos: ${itemsText}\n`
                     + (appliedCoupon ? `• Cupón: ${appliedCoupon}\n` : '')
                     + `• Total abonado: ${fmt(total)}\n`
-                    + `Adjunto mi comprobante de pago a continuación:`;
+                    + `Mi pago ya fue verificado ✅`;
 
     navigator.clipboard.writeText(summaryText);
-    showToast('Resumen copiado. Abrí el ticket en Discord y pegalo.');
+    showToast('Resumen copiado. Pegalo en tu ticket de Discord.');
   });
 
   function closeCheckout(){ checkoutOverlay.classList.remove('open'); }
