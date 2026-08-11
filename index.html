@@ -1096,8 +1096,7 @@ async function sendDiscordOrderNotification(order){
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'apikey': sb_publishable_2r5BYlqRe1uJbs_aKp1FCA_DLWEy0cC
+        'apikey': SUPABASE_KEY
       },
       body: JSON.stringify(order)
     });
